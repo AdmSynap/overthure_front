@@ -1,4 +1,14 @@
 {
+  "name": "overthure-front",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "server": "node server.js"
+  },
   "dependencies": {
     "@radix-ui/react-hover-card": "^1.1.15",
     "@radix-ui/react-menubar": "^1.1.16",
@@ -31,6 +41,7 @@
     "path": "^0.12.7",
     "typescript": "^5.9.3",
     "url": "^0.11.4",
+    "vite": "^5.1.2",
     "vite-plugin-manus-runtime": "^0.0.57"
   }
 }
