@@ -18,18 +18,19 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // O alias continua apontando para dentro de client/src
       "@": path.resolve(__dirname, "client", "src"),
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
+      // ADICIONE ESTAS LINHAS ABAIXO PARA FORÇAR O REACT:
+      "react": path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
+      "react/jsx-dev-runtime": path.resolve(__dirname, "node_modules/react/jsx-dev-runtime"),
     },
   },
   envDir: __dirname,
-  // REMOVIDO: root: path.resolve(__dirname, "client"),
-  // Agora o root é a pasta principal do projeto
-  
   build: {
-    outDir: "dist", // Simplificado para o padrão do Vercel
+    outDir: "dist",
     emptyOutDir: true,
   },
   server: {
