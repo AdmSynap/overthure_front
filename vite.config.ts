@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { jsxLocPlugin } from "@builder.io/vite-plugin-jsx-loc";
-// REMOVIDO: import { vitePluginManusRuntime } from "vite-plugin-manus-runtime"; 
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -14,7 +13,6 @@ export default defineConfig({
     react(),
     tailwindcss(),
     jsxLocPlugin(),
-    // REMOVIDO: vitePluginManusRuntime()
   ],
   resolve: {
     alias: {
@@ -22,12 +20,14 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
       
+      // MANTENHA APENAS OS DO REACT (ESSENCIAIS)
       "react": path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
       "react/jsx-dev-runtime": path.resolve(__dirname, "node_modules/react/jsx-dev-runtime"),
-      "tailwindcss": path.resolve(__dirname, "node_modules/tailwindcss"),
-      "tw-animate-css": path.resolve(__dirname, "node_modules/tailwindcss-animate"),
+
+      // ❌ REMOVIDO: "tailwindcss" (Causava o erro EISDIR)
+      // ❌ REMOVIDO: "tw-animate-css" (Causaria o mesmo erro)
     },
   },
   envDir: __dirname,
