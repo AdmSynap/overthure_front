@@ -11,14 +11,12 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": false,
-    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@/*": ["client/src/*"],
+      "@shared/*": ["shared/*"]
     },
-    "types": ["node", "vite/client"]
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["client/src/**/*", "shared/**/*"]
 }
