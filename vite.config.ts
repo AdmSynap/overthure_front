@@ -11,22 +11,25 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
-    react(), 
-    tailwindcss(), 
-    jsxLocPlugin(), 
+    react(),
+    tailwindcss(),
+    jsxLocPlugin(),
     vitePluginManusRuntime()
   ],
   resolve: {
     alias: {
+      // O alias continua apontando para dentro de client/src
       "@": path.resolve(__dirname, "client", "src"),
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
     },
   },
   envDir: __dirname,
-  root: path.resolve(__dirname, "client"),
+  // REMOVIDO: root: path.resolve(__dirname, "client"),
+  // Agora o root é a pasta principal do projeto
+  
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    outDir: "dist", // Simplificado para o padrão do Vercel
     emptyOutDir: true,
   },
   server: {
