@@ -20,14 +20,14 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
       
-      // MANTENHA APENAS OS DO REACT (ESSENCIAIS)
+      // MANTENHA APENAS OS DO REACT (Isso ajuda o Vite a não se perder)
       "react": path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
       "react/jsx-dev-runtime": path.resolve(__dirname, "node_modules/react/jsx-dev-runtime"),
 
       // ❌ REMOVIDO: "tailwindcss" (Causava o erro EISDIR)
-      // ❌ REMOVIDO: "tw-animate-css" (Causaria o mesmo erro)
+      // ❌ REMOVIDO: "tw-animate-css"
     },
   },
   envDir: __dirname,
