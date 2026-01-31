@@ -21,11 +21,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "client", "src"),
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
-      // ADICIONE ESTAS LINHAS ABAIXO PARA FORÇAR O REACT:
+      
+      // --- CORREÇÕES DE BUILD ---
       "react": path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
       "react/jsx-dev-runtime": path.resolve(__dirname, "node_modules/react/jsx-dev-runtime"),
+      "tailwindcss": path.resolve(__dirname, "node_modules/tailwindcss"),
+      
+      // AQUI ESTÁ A MÁGICA PARA O SEU CSS:
+      // Redireciona o import desconhecido para o pacote que acabamos de instalar
+      "tw-animate-css": path.resolve(__dirname, "node_modules/tailwindcss-animate"),
+      // --------------------------
     },
   },
   envDir: __dirname,
