@@ -1,35 +1,57 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import PortfolioPage from "./pages/PortfolioPage";
+import ContatoForm from "./pages/ContatoForm"; // Certifique-se de criar este arquivo na pasta pages
 
 function Router() {
+  const [, setLocation] = useLocation();
+
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      <Route path="/" component={Home} />
+      
+      {/* Rota para o Portfólio Completo */}
+      <Route path="/portfolio">
+        {() => (
+          <PortfolioPage 
+            onBack={() => {
+              window.scrollTo(0, 0);
+              setLocation("/");
+            }} 
+          />
+        )}
+      </Route>
+
+      {/* Rota para o Formulário de Contato */}
+      <Route path="/contato-form" component={ContatoForm} />
+
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="dark"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
+          {/* INJEÇÃO DE ESTILO GLOBAL PARA SMOOTH SCROLL */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            html {
+              scroll-behavior: smooth;
+            }
+            /* Evita que o título das seções fique escondido sob o menu fixo */
+            #sobre, #areas, #diferenciais, #contato, #servicos, #portfolio {
+              scroll-margin-top: 80px;
+            }
+          `}} />
+          
           <Toaster />
           <Router />
         </TooltipProvider>
