@@ -25,6 +25,7 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 export default function Home() {
   const [, setLocation] = useLocation();
   const [isScrolling, setIsScrolling] = useState(false);
+  const lenisRef = useRef<any>(null); // Referência para o Lenis
   
   // Ref para controlar o scroll da Hero
   const heroRef = useRef(null);
@@ -36,6 +37,36 @@ export default function Home() {
   // Transformações: de 100% para 70% de escala e de 1 para 0 de opacidade
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  // INICIALIZAÇÃO DO LENIS VIA CDN (BLINDADO CONTRA ERROS)
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/lenis@1.1.18/dist/lenis.min.js";
+    script.async = true;
+    document.head.appendChild(script);
+
+    script.onload = () => {
+      // @ts-ignore
+      const lenis = new (window as any).Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+
+      lenisRef.current = lenis;
+
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+    };
+
+    return () => {
+      if (lenisRef.current) lenisRef.current.destroy();
+      if (document.head.contains(script)) document.head.removeChild(script);
+    };
+  }, []);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -53,7 +84,11 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(element, { offset: -20 });
+      } else {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -80,6 +115,12 @@ export default function Home() {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
+        /* Configuração obrigatória para o Lenis */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #2dd4bf; border-radius: 10px; transition: opacity 0.3s; }
@@ -329,9 +370,6 @@ export default function Home() {
               </div>
               <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
               <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
-              <Button onClick={() => { window.scrollTo(0, 0); setLocation("/portfolio"); }} className="bg-gradient-to-r from-teal-500 to-orange-600 text-black border-0 px-8 py-6 text-lg hover:opacity-90 group transition-all rounded-xl font-bold">
-                Ver Portfólio Completo <ExternalLink className="ml-2 w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </Button>
             </motion.div>
 
             <div className="grid grid-cols-2 gap-6">

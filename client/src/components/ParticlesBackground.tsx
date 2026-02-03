@@ -12,7 +12,6 @@ interface Particle {
 
 export default function ParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // 1. Referência para a posição do mouse
   const mouse = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
@@ -29,7 +28,6 @@ export default function ParticlesBackground() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // 2. Listener para capturar o mouse
     const handleMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
@@ -37,17 +35,17 @@ export default function ParticlesBackground() {
     window.addEventListener('mousemove', handleMouseMove);
 
     const particles: Particle[] = [];
-    const particleCount = 50;
+    const particleCount = 80; // Aumentei um pouco a contagem para preencher o espaço sem as linhas
     const colors = ["20, 184, 166", "234, 88, 12"];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 2 + 1,
-        speedX: (Math.random() - 0.5) * 0.5,
-        speedY: (Math.random() - 0.5) * 0.5,
-        opacity: Math.random() * 0.5 + 0.2,
+        size: Math.random() * 1.5 + 1,
+        speedX: (Math.random() - 0.5) * 0.4,
+        speedY: (Math.random() - 0.5) * 0.4,
+        opacity: Math.random() * 0.4 + 0.3,
         color: colors[Math.floor(Math.random() * colors.length)] 
       });
     }
@@ -56,63 +54,46 @@ export default function ParticlesBackground() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       particles.forEach((particle) => {
-        // --- LOGICA DE MOVIMENTO AO PASSAR O CURSOR ---
+        // Interação com o mouse (repulsão)
         const dx = mouse.current.x - particle.x;
         const dy = mouse.current.y - particle.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance < 120) { // Raio de interação
+        if (distance < 120) { 
           const force = (120 - distance) / 120;
           const dirX = dx / distance;
           const dirY = dy / distance;
-          // Empurra a partícula levemente
-          particle.x -= dirX * force * 4;
-          particle.y -= dirY * force * 4;
+          particle.x -= dirX * force * 3;
+          particle.y -= dirY * force * 3;
         }
-        // ----------------------------------------------
 
         particle.x += particle.speedX;
         particle.y += particle.speedY;
 
+        // Reposicionamento infinito (wrap around)
         if (particle.x < 0) particle.x = canvas.width;
         if (particle.x > canvas.width) particle.x = 0;
         if (particle.y < 0) particle.y = canvas.height;
         if (particle.y > canvas.height) particle.y = 0;
 
-        // SEU DESIGN ORIGINAL ABAIXO (INTOCADO)
+        // Desenho do Brilho (Glow)
         ctx.beginPath();
         const gradient = ctx.createRadialGradient(
           particle.x, particle.y, 0,
-          particle.x, particle.y, particle.size * 4
+          particle.x, particle.y, particle.size * 6
         );
-        gradient.addColorStop(0, `rgba(${particle.color}, ${particle.opacity})`);
+        gradient.addColorStop(0, `rgba(${particle.color}, ${particle.opacity * 0.6})`);
         gradient.addColorStop(1, `rgba(${particle.color}, 0)`);
         
         ctx.fillStyle = gradient;
-        ctx.arc(particle.x, particle.y, particle.size * 4, 0, Math.PI * 2);
+        ctx.arc(particle.x, particle.y, particle.size * 6, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = `rgba(${particle.color}, ${particle.opacity * 1.5})`;
+        // Desenho do Núcleo
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${particle.color}, ${particle.opacity})`;
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fill();
-      });
-
-      // CONEXÕES ORIGINAIS
-      particles.forEach((particleA, indexA) => {
-        particles.slice(indexA + 1).forEach((particleB) => {
-          const dx = particleA.x - particleB.x;
-          const dy = particleA.y - particleB.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 150) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(${particleA.color}, ${(1 - distance / 150) * 0.2})`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particleA.x, particleA.y);
-            ctx.lineTo(particleB.x, particleB.y);
-            ctx.stroke();
-          }
-        });
       });
 
       requestAnimationFrame(animate);
@@ -130,7 +111,7 @@ export default function ParticlesBackground() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 pointer-events-none"
-      style={{ opacity: 0.4 }}
+      style={{ opacity: 1 }}
     />
   );
 }
