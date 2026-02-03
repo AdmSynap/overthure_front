@@ -361,36 +361,72 @@ export default function Home() {
       </section>
 
       {/* Portfólio */}
-      <section id="portfolio" className="py-24 bg-black/80 backdrop-blur-sm relative z-10 overflow-hidden">
-        <div className="container relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
-                <Sparkles className="w-4 h-4" /> <span>Projetos Realizados</span>
-              </div>
-              <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
-              <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
-            </motion.div>
+<section id="portfolio" className="py-24 bg-black relative z-10 overflow-hidden">
+  <div className="container relative z-10">
+    <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
+          <Sparkles className="w-4 h-4" /> <span>Projetos Realizados</span>
+        </div>
+        <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
+        <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
+      </motion.div>
 
-            <div className="grid grid-cols-2 gap-6">
-              {[
-                { icon: Users, value: "95%", label: "Retenção de Clientes", color: "bg-teal-500/10 border-teal-500/30" },
-                { icon: Code2, value: "100%", label: "Satisfação", color: "bg-orange-600/10 border-orange-600/30" },
-                { icon: Star, value: "4.9/5", label: "Média de Estrelas", color: "bg-teal-500/10 border-teal-500/30" },
-                { icon: Timer, value: "Ágil", label: "Resposta Rápida", color: "bg-orange-600/10 border-orange-600/30" }
-              ].map((stat, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} whileHover={{ scale: 1.05 }} className={`p-8 rounded-2xl border ${stat.color} backdrop-blur-sm space-y-4`}>
-                  <stat.icon className="w-8 h-8 text-white/80" />
-                  <div>
-                    <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                    <div className="text-sm text-gray-500 font-medium">{stat.label}</div>
-                  </div>
-                </motion.div>
-              ))}
+      {/* CARDS ALTERADOS PARA O DESIGN DA IMAGEM */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+        
+        {/* Card 1: Abela Mielo */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          whileHover={{ y: -10 }}
+          className="aspect-square rounded-[40px] border border-teal-500/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+        >
+          {/* Ícone Superior Direito */}
+          <div className="flex justify-end">
+            <Code2 className="text-teal-500/40 w-10 h-10 group-hover:text-teal-400 transition-colors" />
+          </div>
+          
+          {/* Conteúdo Inferior */}
+          <div>
+            <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
+            <div className="flex items-center justify-between">
+              <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
+              <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 group-hover:text-black transition-all duration-300">
+                <ArrowRight className="w-5 h-5 -rotate-45" />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </motion.div>
+
+        {/* Card 2: Core Engine */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }} 
+          whileInView={{ opacity: 1, y: 20 }} 
+          whileHover={{ y: 10 }}
+          className="aspect-square rounded-[40px] border border-orange-600/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+        >
+          {/* Ícone Superior Direito */}
+          <div className="flex justify-end">
+            <Sparkles className="text-orange-600/40 w-10 h-10 group-hover:text-orange-500 transition-colors" />
+          </div>
+
+          {/* Conteúdo Inferior */}
+          <div>
+            <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
+            <div className="flex items-center justify-between">
+              <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
+              <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 group-hover:text-black transition-all duration-300">
+                <ArrowRight className="w-5 h-5 -rotate-45" />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Diferenciais */}
       <section id="diferenciais" className="py-24 bg-card/30 relative z-10">
