@@ -128,7 +128,7 @@ export default function Home() {
         * { scrollbar-width: thin; scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent; transition: scrollbar-color 0.3s; }
       `}} />
 
-      {/* Navegação */}
+     {/* Navegação */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -139,14 +139,79 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-teal-500">Overthure Tech</h1>
           </div>
+          
           <div className="hidden md:flex items-center gap-8">
-            <button onClick={() => scrollToSection('sobre')} className="text-sm hover:text-primary transition-colors">Sobre</button>
-            <button onClick={() => scrollToSection('areas')} className="text-sm hover:text-primary transition-colors">Áreas de Atuação</button>
-            <button onClick={() => scrollToSection('servicos')} className="text-sm hover:text-primary transition-colors">Nossos Serviços</button>
-            <button onClick={() => scrollToSection('portfolio')} className="text-sm hover:text-primary transition-colors">Portfólio</button>
-            <button onClick={() => scrollToSection('diferenciais')} className="text-sm hover:text-primary transition-colors">Diferenciais</button>
-            <button onClick={() => scrollToSection('contato')} className="text-sm hover:text-primary transition-colors">Contato</button>
+            {[
+              { id: 'sobre', label: 'Sobre' },
+              { id: 'areas', label: 'Áreas de Atuação' },
+              { id: 'servicos', label: 'Nossos Serviços' },
+              { id: 'portfolio', label: 'Portfólio' },
+              { id: 'diferenciais', label: 'Diferenciais' },
+              { id: 'contato', label: 'Contato' }
+            ].map((item) => (
+              <motion.button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                initial="initial"
+                whileHover="hover"
+                className="group relative py-2 text-sm font-medium overflow-hidden"
+              >
+                {/* Container das Letras */}
+                <div className="relative flex overflow-hidden">
+                  {item.label.split("").map((char, index) => (
+                    <span 
+                      key={index} 
+                      className="relative inline-block"
+                      style={{ minWidth: char === " " ? "0.4em" : "auto" }}
+                    >
+                      {/* Letra Original (Branca) - Sobe para sair */}
+                      <motion.span
+                        variants={{
+                          initial: { y: 0 },
+                          hover: { y: "-100%" }
+                        }}
+                        transition={{
+                          duration: 0.4,
+                          delay: index * 0.02,
+                          ease: [0.215, 0.61, 0.355, 1]
+                        }}
+                        className="inline-block"
+                      >
+                        {char}
+                      </motion.span>
+
+                      {/* Letra Azul Turquesa - Sobe para entrar */}
+                      <motion.span
+                        variants={{
+                          initial: { y: "100%" },
+                          hover: { y: 0 }
+                        }}
+                        transition={{
+                          duration: 0.4,
+                          delay: index * 0.02,
+                          ease: [0.215, 0.61, 0.355, 1]
+                        }}
+                        className="absolute left-0 top-0 text-teal-400"
+                      >
+                        {char}
+                      </motion.span>
+                    </span>
+                  ))}
+                </div>
+
+                {/* Linha Azul Turquesa animada */}
+                <motion.span 
+                  variants={{
+                    initial: { scaleX: 0 },
+                    hover: { scaleX: 1 }
+                  }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="absolute bottom-0 left-0 w-full h-[2px] bg-teal-400 origin-left"
+                />
+              </motion.button>
+            ))}
           </div>
+
           <Button 
             onClick={() => setLocation("/contato-form")}
             variant="default" 
