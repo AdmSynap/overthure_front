@@ -303,9 +303,6 @@ export default function Home() {
             <p className="text-lg text-muted-foreground leading-relaxed">
               A Overthure Tech nasceu da visão de transformar ideias ousadas em reality tecnológica. O trabalho desenvolvido caracteriza-se por uma vision multidisciplinar, integrando pesquisa e engenharia para criar soluções à prova de futuro.
             </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Nossa base metodológica já se encontra validada e pronta para gerar soluções de excelência global.
-            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
