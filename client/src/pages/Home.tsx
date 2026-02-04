@@ -261,7 +261,8 @@ export default function Home() {
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <Button onClick={() => scrollToSection('sobre')} size="lg" className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group">
+                {/* BOTÃO ATUALIZADO AQUI: Redireciona para 'portfolio' */}
+                <Button onClick={() => scrollToSection('portfolio')} size="lg" className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group">
                   Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button size="lg" className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors">
@@ -319,6 +320,74 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Portfólio */}
+<section id="portfolio" className="py-24 bg-black relative z-10 overflow-hidden">
+  <div className="container relative z-10">
+    <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
+          <Sparkles className="w-4 h-4" /> <span>Projetos Realizados</span>
+        </div>
+        <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
+        <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
+      </motion.div>
+
+      {/* CARDS ALTERADOS PARA O DESIGN DA IMAGEM */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+        
+        {/* Card 1: Abela Mielo */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          whileHover={{ y: -10 }}
+          className="aspect-square rounded-[40px] border border-teal-500/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+        >
+          {/* Ícone Superior Direito */}
+          <div className="flex justify-end">
+            <Code2 className="text-teal-500/40 w-10 h-10 group-hover:text-teal-400 transition-colors" />
+          </div>
+          
+          {/* Conteúdo Inferior */}
+          <div>
+            <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
+            <div className="flex items-center justify-between">
+              <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
+              <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 group-hover:text-black transition-all duration-300">
+                <ArrowRight className="w-5 h-5 -rotate-45" />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Card 2: Core Engine */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }} 
+          whileInView={{ opacity: 1, y: 20 }} 
+          whileHover={{ y: 10 }}
+          className="aspect-square rounded-[40px] border border-orange-600/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+        >
+          {/* Ícone Superior Direito */}
+          <div className="flex justify-end">
+            <Sparkles className="text-orange-600/40 w-10 h-10 group-hover:text-orange-500 transition-colors" />
+          </div>
+
+          {/* Conteúdo Inferior */}
+          <div>
+            <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
+            <div className="flex items-center justify-between">
+              <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
+              <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 group-hover:text-black transition-all duration-300">
+                <ArrowRight className="w-5 h-5 -rotate-45" />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Áreas de Atuação */}
       <section id="areas" className="py-24 relative z-10">
@@ -424,74 +493,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      {/* Portfólio */}
-<section id="portfolio" className="py-24 bg-black relative z-10 overflow-hidden">
-  <div className="container relative z-10">
-    <div className="grid lg:grid-cols-2 gap-16 items-center">
-      <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
-          <Sparkles className="w-4 h-4" /> <span>Projetos Realizados</span>
-        </div>
-        <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
-        <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
-      </motion.div>
-
-      {/* CARDS ALTERADOS PARA O DESIGN DA IMAGEM */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
-        
-        {/* Card 1: Abela Mielo */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          whileInView={{ opacity: 1, y: 0 }} 
-          whileHover={{ y: -10 }}
-          className="aspect-square rounded-[40px] border border-teal-500/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
-        >
-          {/* Ícone Superior Direito */}
-          <div className="flex justify-end">
-            <Code2 className="text-teal-500/40 w-10 h-10 group-hover:text-teal-400 transition-colors" />
-          </div>
-          
-          {/* Conteúdo Inferior */}
-          <div>
-            <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
-            <div className="flex items-center justify-between">
-              <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
-              <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 group-hover:text-black transition-all duration-300">
-                <ArrowRight className="w-5 h-5 -rotate-45" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Card 2: Core Engine */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }} 
-          whileInView={{ opacity: 1, y: 20 }} 
-          whileHover={{ y: 10 }}
-          className="aspect-square rounded-[40px] border border-orange-600/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
-        >
-          {/* Ícone Superior Direito */}
-          <div className="flex justify-end">
-            <Sparkles className="text-orange-600/40 w-10 h-10 group-hover:text-orange-500 transition-colors" />
-          </div>
-
-          {/* Conteúdo Inferior */}
-          <div>
-            <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
-            <div className="flex items-center justify-between">
-              <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
-              <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 group-hover:text-black transition-all duration-300">
-                <ArrowRight className="w-5 h-5 -rotate-45" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-      </div>
-    </div>
-  </div>
-</section>
 
       {/* Diferenciais */}
       <section id="diferenciais" className="py-24 bg-card/30 relative z-10">
