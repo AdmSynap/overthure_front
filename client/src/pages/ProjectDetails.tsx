@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
-import { motion } from "framer-motion";
-// CORREÇÃO: ArrowRight adicionado na importação abaixo
-import { ArrowLeft, ArrowRight, ExternalLink, Calendar, Layers, User } from "lucide-react";
+// 1. IMPORTANTE: Adicionado useSpring
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowDown, ExternalLink, Calendar, Layers, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
@@ -16,6 +16,7 @@ interface Project {
   services: string[];
   color: string;
   images: string[];
+  url: string;
 }
 
 const projectsData: Record<string, Project> = {
@@ -28,6 +29,7 @@ const projectsData: Record<string, Project> = {
     client: "Abela Mielo Cosmetics",
     services: ["Identidade Visual", "UX/UI Design", "Frontend Dev"],
     color: "from-teal-500 to-emerald-700",
+    url: "https://www.instagram.com/abelamielo",
     images: [
       "bg-gradient-to-br from-teal-900/40 to-black",
       "bg-gradient-to-tl from-emerald-900/40 to-black",
@@ -43,6 +45,7 @@ const projectsData: Record<string, Project> = {
     client: "FinTech Global Corp",
     services: ["Software Architecture", "React Development", "Real-time Data"],
     color: "from-orange-600 to-red-800",
+    url: "https://www.google.com",
     images: [
       "bg-gradient-to-br from-orange-900/40 to-black",
       "bg-gradient-to-tl from-red-900/40 to-black",
@@ -51,11 +54,62 @@ const projectsData: Record<string, Project> = {
   }
 };
 
+// --- COMPONENTE COM EFEITO "AMANTEIGADO" ---
+const ZoomImage = ({ imgClass, index }: { imgClass: string, index: number }) => {
+    const ref = useRef(null);
+    
+    // 1. Captura o scroll bruto
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start end", "center center"] 
+    });
+
+    // 2. Aplica a física de mola (O segredo do "Buttery Smooth")
+    const smoothProgress = useSpring(scrollYProgress, {
+        stiffness: 150, // Tensão da mola (quanto maior, mais rápido segue)
+        damping: 25,    // Fricção (quanto maior, menos "balança")
+        mass: 0.5,      // Peso
+        restDelta: 0.001
+    });
+
+    // 3. Usa o valor suavizado (smoothProgress) ao invés do bruto
+    const scale = useTransform(smoothProgress, [0, 1], [0.85, 1]);
+    const opacity = useTransform(smoothProgress, [0, 0.6], [0.5, 1]);
+
+    return (
+        <motion.div 
+            ref={ref}
+            style={{ scale, opacity }}
+            className={`w-full aspect-square rounded-xl border border-white/10 ${imgClass} relative overflow-hidden group`}
+        >
+            <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-white/20 text-2xl font-bold uppercase tracking-widest group-hover:scale-110 transition-transform duration-700">Detail {index + 2}</span>
+            </div>
+        </motion.div>
+    );
+};
+// -------------------------------------------------------
+
 export default function ProjectDetails({ params }: { params: { id: string } }) {
   const [, setLocation] = useLocation();
   
   const projectId = params.id;
   const project = projectsData[projectId];
+
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000); 
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,29 +127,66 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-teal-500/30">
+    <div className={`min-h-screen bg-background text-foreground selection:bg-teal-500/30 overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
+      
+      <style dangerouslySetInnerHTML={{ __html: `
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+          background: ${isScrolling ? '#2dd4bf' : 'transparent'}; 
+          border-radius: 10px; 
+          transition: background 0.3s; 
+        }
+        html {
+          scrollbar-width: thin;
+          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
+          transition: scrollbar-color 0.3s;
+        }
+      `}} />
+
       <ParticlesBackground />
       
-      {/* HEADER DE NAVEGAÇÃO */}
-      <nav className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center backdrop-blur-sm bg-background/50 border-b border-white/5">
+      {/* HEADER TRANSPARENTE */}
+      <nav className="absolute top-0 left-0 w-full z-50 p-6 flex justify-between items-center bg-transparent">
         <Button 
           onClick={() => setLocation("/")} 
           variant="ghost" 
-          className="text-muted-foreground hover:text-white hover:bg-white/5 gap-2 uppercase tracking-widest text-xs"
+          className="text-muted-foreground hover:text-white hover:bg-white/10 gap-2 uppercase tracking-widest text-xs"
         >
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
         <span className="text-xs font-mono text-muted-foreground uppercase">{project.category}</span>
       </nav>
 
-      <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
+      {/* HERO FULL SCREEN */}
+      <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className={`relative w-full h-screen flex items-center justify-center ${project.images[0]} bg-cover bg-center`}
+      >
+          <span className="text-white/20 text-4xl md:text-6xl font-bold uppercase tracking-widest">
+              Project Highlight 01
+          </span>
+          <motion.div
+            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+            animate={{ y: [0, 12, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          >
+             <ArrowDown className="w-8 h-8 text-white/70" />
+          </motion.div>
+      </motion.div>
+
+      {/* CONTEÚDO */}
+      <div className="container mx-auto px-4 pt-24 pb-20 relative z-10">
         
-        {/* HERO DO PROJETO */}
+        {/* TÍTULO */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-5xl mx-auto mb-24"
+          className="max-w-5xl mx-auto mb-24 text-center"
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tighter leading-[0.9]">
             {project.title}
@@ -105,11 +196,12 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
           </h1>
         </motion.div>
 
-        {/* GRID DE INFORMAÇÕES */}
+        {/* INFO GRID */}
         <motion.div 
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2, duration: 0.8 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-8 border-y border-white/10 py-12 mb-24"
         >
           <div className="space-y-2">
@@ -130,7 +222,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
           </div>
         </motion.div>
 
-        {/* DESCRIÇÃO E CONTEXTO */}
+        {/* DESCRIÇÃO */}
         <div className="grid md:grid-cols-12 gap-12 mb-32">
           <div className="md:col-span-4">
             <h3 className="text-2xl font-bold mb-4 border-l-4 border-teal-500 pl-4">O Desafio</h3>
@@ -140,46 +232,26 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
               {project.description}
             </p>
             <div className="mt-8">
-                <Button className={`bg-gradient-to-r ${project.color} text-white border-0`}>
-                    Visitar Projeto Online <ExternalLink className="ml-2 w-4 h-4" />
+                <Button 
+                  onClick={() => window.open(project.url, '_blank')}
+                  className="bg-gradient-to-r from-teal-500 to-orange-600 text-black font-bold hover:opacity-90 border-0 transition-all px-8 h-12"
+                >
+                    Visitar Website <ExternalLink className="ml-2 w-5 h-5" />
                 </Button>
             </div>
           </div>
         </div>
 
-        {/* GALERIA DE IMAGENS */}
+        {/* GALERIA SECUNDÁRIA (COM EFEITO SPRING) */}
         <div className="space-y-8">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className={`w-full aspect-video rounded-xl border border-white/10 ${project.images[0]} relative overflow-hidden group`}
-          >
-             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white/20 text-4xl font-bold uppercase tracking-widest group-hover:scale-110 transition-transform duration-700">Project Highlight 01</span>
-             </div>
-          </motion.div>
-
           <div className="grid md:grid-cols-2 gap-8">
             {project.images.slice(1).map((imgClass, index) => (
-               <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className={`w-full aspect-square rounded-xl border border-white/10 ${imgClass} relative overflow-hidden group`}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white/20 text-2xl font-bold uppercase tracking-widest group-hover:scale-110 transition-transform duration-700">Detail {index + 2}</span>
-                </div>
-              </motion.div>
+               <ZoomImage key={index} imgClass={imgClass} index={index} />
             ))}
           </div>
         </div>
 
-        {/* FOOTER DO PROJETO */}
+        {/* FOOTER */}
         <div className="mt-32 border-t border-white/10 pt-12 flex justify-between items-center">
             <div className="text-sm text-muted-foreground">Próximo Projeto</div>
             <Button 
