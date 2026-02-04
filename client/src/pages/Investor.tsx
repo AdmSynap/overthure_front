@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, TrendingUp, ShieldCheck, Globe, Rocket, CheckCircle, Calendar } from "lucide-react";
@@ -9,12 +9,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import ParticlesBackground from "@/components/ParticlesBackground";
+import emailjs from "@emailjs/browser";
 
 export default function Investor() {
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Ref para o formulário
+  const formRef = useRef<HTMLFormElement>(null);
 
-  // --- LÓGICA DA BARRA DE ROLAGEM (Igual ao Contato) ---
+  // --- LÓGICA DA BARRA DE ROLAGEM ---
   const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
@@ -24,12 +28,12 @@ export default function Investor() {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setIsScrolling(false);
-      }, 1000); // Some após 1 segundo sem rolar
+      }, 1000); 
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  // -----------------------------------------------------
+  // ----------------------------------
 
   const reasons = [
     {
@@ -54,16 +58,44 @@ export default function Investor() {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Solicitação Recebida", {
-        description: "Nossa equipe de RI (Relações com Investidores) entrará em contato em até 24h.",
-      });
-    }, 1500);
+    // DADOS PARA O EMAILJS
+    const form = formRef.current;
+    
+    const templateParams = {
+        from_name: form?.firstName.value,
+        from_lastname: form?.lastName.value,
+        from_email: form?.email.value,
+        company: form?.company.value || "Não informada",
+        message: form?.interest.value
+    };
+
+    // --- SUAS CHAVES DO EMAILJS ---
+    // Dica: Você pode usar o mesmo Service ID e Public Key, 
+    // mas recomendo criar um Template diferente para Investidores.
+    const SERVICE_ID = "service_9jrlhhh";         // Mesmo do contato
+    const TEMPLATE_ID = "template_09d9pdy"; // Crie um template novo para investidores
+    const PUBLIC_KEY = "UQ-1Pjv_78A_IEebC";         // Mesma do contato
+
+    try {
+        await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+        
+        setIsSubmitting(false);
+        toast.success("Solicitação Recebida", {
+            description: "Nossa equipe de RI (Relações com Investidores) entrará em contato em até 24h.",
+        });
+        
+        // Redireciona para home após sucesso
+        setTimeout(() => setLocation("/"), 4000);
+
+    } catch (error) {
+        console.error("Erro EmailJS:", error);
+        setIsSubmitting(false);
+        toast.error("Erro ao enviar. Por favor, tente novamente.");
+    }
   };
 
   const fadeInUp = {
@@ -84,8 +116,6 @@ export default function Investor() {
           border-radius: 10px; 
           transition: background 0.3s; 
         }
-        
-        /* Firefox */
         html {
           scrollbar-width: thin;
           scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
@@ -113,7 +143,6 @@ export default function Investor() {
             <motion.div variants={fadeInUp} initial="initial" animate="animate">
               <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Investidores</span>
               <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
-                {/* ALTERAÇÃO AQUI: Cor alterada para text-teal-500 */}
                 Impulsione o Futuro com a <span className="text-teal-500">Overthure</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
@@ -176,32 +205,39 @@ export default function Investor() {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Form com REF para capturar dados */}
+                <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Nome</Label>
-                      <Input id="firstName" placeholder="Seu nome" required className="bg-white/5 border-white/10 focus:border-orange-500" />
+                      {/* Name adicionado */}
+                      <Input id="firstName" name="firstName" placeholder="Seu nome" required className="bg-white/5 border-white/10 focus:border-orange-500" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastName">Sobrenome</Label>
-                      <Input id="lastName" placeholder="Sobrenome" required className="bg-white/5 border-white/10 focus:border-orange-500" />
+                      {/* Name adicionado */}
+                      <Input id="lastName" name="lastName" placeholder="Sobrenome" required className="bg-white/5 border-white/10 focus:border-orange-500" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="email">E-mail Corporativo</Label>
-                    <Input id="email" type="email" placeholder="voce@empresa.com" required className="bg-white/5 border-white/10 focus:border-orange-500" />
+                    {/* Name adicionado */}
+                    <Input id="email" name="email" type="email" placeholder="voce@empresa.com" required className="bg-white/5 border-white/10 focus:border-orange-500" />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="company">Empresa / Fundo</Label>
-                    <Input id="company" placeholder="Nome da organização" className="bg-white/5 border-white/10 focus:border-orange-500" />
+                    {/* Name adicionado */}
+                    <Input id="company" name="company" placeholder="Nome da organização" className="bg-white/5 border-white/10 focus:border-orange-500" />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="interest">Mensagem / Interesse</Label>
+                    {/* Name adicionado */}
                     <Textarea 
-                      id="interest" 
+                      id="interest"
+                      name="interest"
                       placeholder="Breve descrição do seu interesse de investimento..." 
                       className="min-h-[120px] bg-white/5 border-white/10 focus:border-orange-500 resize-none" 
                     />
