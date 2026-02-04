@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, TrendingUp, ShieldCheck, Globe, Rocket, CheckCircle, Calendar } from "lucide-react";
@@ -7,12 +7,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner"; // CORREÇÃO: Usando sonner diretamente
+import { toast } from "sonner";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default function Investor() {
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // --- LÓGICA DA BARRA DE ROLAGEM (Igual ao Contato) ---
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000); // Some após 1 segundo sem rolar
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  // -----------------------------------------------------
 
   const reasons = [
     {
@@ -41,17 +58,11 @@ export default function Investor() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulação de envio
     setTimeout(() => {
       setIsSubmitting(false);
-      
-      // CORREÇÃO: Sintaxe do Sonner
       toast.success("Solicitação Recebida", {
         description: "Nossa equipe de RI (Relações com Investidores) entrará em contato em até 24h.",
       });
-      
-      // Opcional: Redirecionar após sucesso
-      // setLocation("/");
     }, 1500);
   };
 
@@ -62,14 +73,31 @@ export default function Investor() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Background animado (mesmo da home) */}
+    <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
+      
+      {/* --- ESTILO DINÂMICO DA SCROLLBAR --- */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+          background: ${isScrolling ? '#2dd4bf' : 'transparent'}; 
+          border-radius: 10px; 
+          transition: background 0.3s; 
+        }
+        
+        /* Firefox */
+        html {
+          scrollbar-width: thin;
+          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
+          transition: scrollbar-color 0.3s;
+        }
+      `}} />
+
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
         <ParticlesBackground />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-12">
-        {/* Botão Voltar */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -81,12 +109,12 @@ export default function Investor() {
 
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           
-          {/* Coluna da Esquerda: Motivos */}
           <div className="space-y-12">
             <motion.div variants={fadeInUp} initial="initial" animate="animate">
               <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Investidores</span>
               <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
-                Impulsione o Futuro com a <span className="text-orange-600">Overthure Tech</span>
+                {/* ALTERAÇÃO AQUI: Cor alterada para text-teal-500 */}
+                Impulsione o Futuro com a <span className="text-teal-500">Overthure Tech</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Estamos construindo a próxima geração de infraestrutura digital. Junte-se a nós nesta jornada e faça parte de um portfólio de alta performance.
@@ -132,7 +160,6 @@ export default function Investor() {
             </motion.div>
           </div>
 
-          {/* Coluna da Direita: Formulário */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -183,7 +210,7 @@ export default function Investor() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white font-bold transition-all mt-4"
+                    className="w-full h-12 mt-4 font-bold transition-all border-0 bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90"
                   >
                     {isSubmitting ? (
                       "Enviando..."

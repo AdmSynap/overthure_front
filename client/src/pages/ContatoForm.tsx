@@ -1,21 +1,23 @@
-import { useState, useEffect } from "react"; // Adicionado useEffect
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Send, CheckCircle2, Mail, MapPin, Sparkles, Code2, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, Send, CheckCircle2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default function ContatoForm() {
   const [, setLocation] = useLocation();
   const [submitted, setSubmitted] = useState(false);
-  const [isScrolling, setIsScrolling] = useState(false); // Estado para detectar scroll
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [selectedBudget, setSelectedBudget] = useState<string>("");
-  const [hasDeadline, setHasDeadline] = useState<string>("");
+  // --- LÓGICA DA BARRA DE ROLAGEM ---
+  const [isScrolling, setIsScrolling] = useState(false);
 
-  // Lógica para mostrar/esconder scrollbar
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     const handleScroll = () => {
@@ -23,25 +25,29 @@ export default function ContatoForm() {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setIsScrolling(false);
-      }, 1000); // Esconde após 1 segundo de inatividade
+      }, 1000); // Some após 1 segundo sem rolar
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  // ----------------------------------
+  
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedBudget, setSelectedBudget] = useState<string>("");
+  const [hasDeadline, setHasDeadline] = useState<string>("");
 
   const servicesOptions = [
-    "Identidade Visual de Marca", "Design", "Desenvolvimento Web", 
-    "Desenvolvimento de Software", "Desenvolvimento de App Mobile", 
-    "WebGL", "Design de Produto", "Branding de Marca"
+    "Identidade Visual", "Design UI/UX", "Web Development", 
+    "Software Customizado", "App Mobile", "WebGL / 3D", 
+    "Design de Produto", "Branding"
   ];
 
-  const budgetOptions = ["2k - 5k", "10k - 25k", "30k - 50k"];
+  const budgetOptions = ["2k - 5k", "10k - 25k", "30k - 50k", "+50k"];
   
   const deadlineOptions = [
     { id: "sim", label: "Sim" },
     { id: "nao", label: "Não" },
-    { id: "urgente", label: "Não, porém o quanto antes" }
+    { id: "urgente", label: "Urgente" }
   ];
 
   const toggleService = (service: string) => {
@@ -52,140 +58,259 @@ export default function ContatoForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedBudget || !hasDeadline) return alert("Preencha todos os campos de seleção.");
-    setSubmitted(true);
-    setTimeout(() => setLocation("/"), 4000); 
+    if (selectedServices.length === 0) {
+      toast.error("Por favor, selecione pelo menos um serviço.");
+      return;
+    }
+    if (!selectedBudget || !hasDeadline) {
+      toast.error("Preencha todos os campos de seleção.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulação de envio
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubmitted(true);
+      toast.success("Briefing enviado com sucesso!");
+      setTimeout(() => setLocation("/"), 5000); 
+    }, 2000);
   };
 
-  const inputStyle = "w-full bg-[#2a2a2a] border border-white/5 rounded-lg p-4 text-white placeholder:text-white/30 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all";
-  
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 }
+  };
+
+  // Estilo dos "Chips" de seleção
   const chipStyle = (isSelected: boolean) => `
-    px-6 py-3 border transition-all duration-300 text-xs font-bold uppercase tracking-tighter rounded-lg
+    px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-md border transition-all duration-300
     ${isSelected 
-      ? "bg-gradient-to-r from-teal-500 to-orange-600 border-none text-black shadow-[0_0_15px_rgba(45,212,191,0.3)]" 
-      : "bg-[#2a2a2a] border-white/5 text-white/70 hover:border-teal-500/50 hover:text-white"
+      ? "bg-gradient-to-r from-teal-500 to-orange-600 border-transparent text-black shadow-lg shadow-teal-500/20" 
+      : "bg-white/5 border-white/10 text-muted-foreground hover:border-teal-500/50 hover:text-white"
     }
   `;
 
   return (
-    <div className={`min-h-screen bg-background text-foreground relative overflow-hidden flex items-center justify-center p-4 py-12 ${isScrolling ? 'is-scrolling' : 'is-idle'}`}>
+    <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
       
-      {/* CSS DINÂMICO PARA A SCROLLBAR */}
+      {/* --- ESTILO DINÂMICO DA SCROLLBAR --- */}
       <style dangerouslySetInnerHTML={{ __html: `
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
           background: ${isScrolling ? '#2dd4bf' : 'transparent'}; 
           border-radius: 10px; 
-          transition: background 0.3s ease-in-out;
+          transition: background 0.3s; 
         }
+        
         /* Firefox */
-        * { 
-          scrollbar-width: thin; 
-          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent; 
+        html {
+          scrollbar-width: thin;
+          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
+          transition: scrollbar-color 0.3s;
         }
       `}} />
-
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      
+      {/* Background animado */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
         <ParticlesBackground />
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 w-full max-w-3xl">
-        <Button 
+      <div className="relative z-10 container mx-auto px-4 py-12">
+        {/* Botão Voltar */}
+        <motion.button
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
           onClick={() => setLocation("/")}
-          variant="ghost" 
-          className="mb-6 bg-[#2a2a2a] text-white hover:bg-[#333333] gap-2 rounded-lg border border-white/5"
+          className="flex items-center gap-2 text-muted-foreground hover:text-teal-500 transition-colors mb-12"
         >
-          <ArrowLeft className="h-4 w-4" /> Voltar para o site
-        </Button>
+          <ArrowLeft className="w-4 h-4" /> Voltar para Home
+        </motion.button>
 
-        <Card className="p-8 md:p-12 bg-card/60 backdrop-blur-xl border-teal-500/30 shadow-2xl">
-          {!submitted ? (
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="mb-10">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">Inicie sua Revolução Digital</h2>
-                <p className="text-muted-foreground text-lg text-teal-500/80 font-medium italic">Briefing Overthure Tech</p>
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
+          
+          {/* COLUNA ESQUERDA: Informações e Contexto */}
+          <div className="space-y-12">
+            <motion.div variants={fadeInUp} initial="initial" animate="animate">
+              <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Contato</span>
+              {/* ALTERAÇÃO AQUI: "Incrível" agora está em text-teal-500 */}
+              <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
+                Vamos Construir Algo <span className="text-teal-500">Incrível</span> Juntos?
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Conte-nos sobre o seu projeto. Nossa equipe de especialistas analisará seu briefing e retornará com uma proposta estratégica.
+              </p>
+            </motion.div>
+
+            {/* Lista de Motivos / Diferenciais Rápidos */}
+            <div className="grid gap-6">
+              {[
+                { icon: Sparkles, title: "Design Exclusivo", desc: "Criamos identidades visuais únicas que destacam sua marca." },
+                { icon: Code2, title: "Tecnologia de Ponta", desc: "Desenvolvimento robusto, escalável e seguro." },
+                { icon: Rocket, title: "Foco em Performance", desc: "Otimização para conversão e velocidade." }
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 + 0.3 }}
+                >
+                  <Card className="bg-card/50 border-teal-500/20 hover:border-teal-500/50 transition-colors">
+                    <CardContent className="p-6 flex items-start gap-4">
+                      <div className="bg-teal-500/10 p-3 rounded-lg text-teal-500">
+                        <item.icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg mb-1 text-foreground">{item.title}</h3>
+                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Informações de Contato Estáticas */}
+            <div className="pt-8 border-t border-white/10 space-y-4">
+              <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
+                <Mail className="w-5 h-5 text-teal-500" />
+                <span>contato@overthuretech.com</span>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">Nome Completo</label>
-                  <input required className={inputStyle} placeholder="Nome completo" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">E-mail</label>
-                  <input required type="email" className={inputStyle} placeholder="seuemail@email.com" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">Quais serviços são necessários?</label>
-                <div className="flex flex-wrap gap-3">
-                  {servicesOptions.map((s) => (
-                    <button key={s} type="button" onClick={() => toggleService(s)} className={chipStyle(selectedServices.includes(s))}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">URL do atual website</label>
-                <input type="url" className={inputStyle} placeholder="https://www.seusite.com.br" />
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">Qual é o seu orçamento?</label>
-                <div className="flex flex-wrap gap-3">
-                  {budgetOptions.map((b) => (
-                    <button key={b} type="button" onClick={() => setSelectedBudget(b)} className={chipStyle(selectedBudget === b)}>
-                      {b}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">Tem prazo para finalização?</label>
-                <div className="flex flex-wrap gap-3">
-                  {deadlineOptions.map((opt) => (
-                    <button key={opt.id} type="button" onClick={() => setHasDeadline(opt.id)} className={chipStyle(hasDeadline === opt.id)}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-                <AnimatePresence>
-                  {hasDeadline === "sim" && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden pt-2">
-                      <input required className={inputStyle} placeholder="Qual o prazo desejado?" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-teal-500 uppercase tracking-widest">Briefing (Resumo do projeto)</label>
-                <textarea required rows={6} className={inputStyle + " resize-none"} placeholder="Escreva seu brief aqui..." />
-              </div>
-
-              <Button type="submit" className="w-full bg-gradient-to-r from-teal-500 to-orange-600 text-black font-black h-16 text-lg hover:opacity-90 transition-all rounded-lg border-none shadow-xl group uppercase">
-                ENVIAR BRIEFING PARA ANÁLISE <Send className="ml-2 h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </Button>
-            </form>
-          ) : (
-            <div className="text-center py-20 space-y-6">
-              <CheckCircle2 className="h-20 w-20 text-teal-500 mx-auto" />
-              <h3 className="text-3xl font-bold text-white uppercase tracking-tighter">Briefing Recebido!</h3>
-              <div className="pt-8">
-                <div className="w-48 h-1 bg-white/5 mx-auto rounded-full overflow-hidden">
-                   <motion.div initial={{ x: "-100%" }} animate={{ x: "0%" }} transition={{ duration: 4 }} className="h-full bg-teal-500 shadow-[0_0_10px_#2dd4bf]" />
-                </div>
-                <p className="text-[10px] mt-4 text-teal-500 uppercase tracking-[0.2em] font-black italic">Redirecionando...</p>
+              <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
+                <MapPin className="w-5 h-5 text-teal-500" />
+                <span>Curitiba, PR - Brasil (Atendimento Global)</span>
               </div>
             </div>
-          )}
-        </Card>
-      </motion.div>
+          </div>
+
+          {/* COLUNA DIREITA: Formulário (Sticky) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="sticky top-8"
+          >
+            <Card className="bg-[#0a0a0a] border-teal-500/20 shadow-2xl shadow-teal-900/10 overflow-hidden">
+              <div className="h-2 w-full bg-gradient-to-r from-teal-500 to-orange-600" />
+              
+              <CardContent className="p-8">
+                {!submitted ? (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-bold text-white">Briefing do Projeto</h2>
+                      <p className="text-muted-foreground text-sm">
+                        Preencha os detalhes abaixo para iniciarmos.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Nome Completo</Label>
+                        <Input required placeholder="Seu nome" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>E-mail</Label>
+                        <Input required type="email" placeholder="seu@email.com" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                      </div>
+                    </div>
+
+                    {/* Seleção de Serviços */}
+                    <div className="space-y-3">
+                      <Label>Quais serviços você precisa?</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {servicesOptions.map((s) => (
+                          <button key={s} type="button" onClick={() => toggleService(s)} className={chipStyle(selectedServices.includes(s))}>
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>URL Atual (Opcional)</Label>
+                      <Input placeholder="https://www.seusite.com.br" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                    </div>
+
+                    {/* Orçamento e Prazo */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <Label>Orçamento Estimado</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {budgetOptions.map((b) => (
+                            <button key={b} type="button" onClick={() => setSelectedBudget(b)} className={chipStyle(selectedBudget === b)}>
+                              {b}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label>Prazo de Entrega</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {deadlineOptions.map((opt) => (
+                            <button key={opt.id} type="button" onClick={() => setHasDeadline(opt.id)} className={chipStyle(hasDeadline === opt.id)}>
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Input Condicional de Prazo */}
+                    <AnimatePresence>
+                      {hasDeadline === "sim" && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                          <Input required placeholder="Qual a data limite desejada?" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="space-y-2">
+                      <Label>Resumo do Projeto (Briefing)</Label>
+                      <Textarea 
+                        required 
+                        rows={4} 
+                        placeholder="Descreva os objetivos, público-alvo e funcionalidades principais..." 
+                        className="bg-white/5 border-white/10 focus:border-teal-500 resize-none" 
+                      />
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full h-12 bg-gradient-to-r from-teal-500 to-orange-600 text-black font-bold uppercase tracking-wide hover:opacity-90 transition-all border-0"
+                    >
+                      {isSubmitting ? "Enviando..." : (
+                        <span className="flex items-center gap-2">
+                          Enviar Proposta <Send className="w-4 h-4" />
+                        </span>
+                      )}
+                    </Button>
+                  </form>
+                ) : (
+                  // TELA DE SUCESSO
+                  <div className="text-center py-20 space-y-6">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
+                      <CheckCircle2 className="h-24 w-24 text-teal-500 mx-auto" />
+                    </motion.div>
+                    <h3 className="text-3xl font-bold text-white uppercase tracking-tighter">Briefing Recebido!</h3>
+                    <p className="text-muted-foreground">Nossa equipe analisará sua solicitação e entrará em contato em breve.</p>
+                    <div className="pt-8">
+                      <div className="w-48 h-1 bg-white/5 mx-auto rounded-full overflow-hidden">
+                          <motion.div initial={{ x: "-100%" }} animate={{ x: "0%" }} transition={{ duration: 5 }} className="h-full bg-teal-500 shadow-[0_0_10px_#2dd4bf]" />
+                      </div>
+                      <p className="text-[10px] mt-4 text-teal-500 uppercase tracking-[0.2em] font-black italic">Redirecionando...</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+}
