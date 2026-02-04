@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Briefcase, Code2, Sparkles, ExternalLink, Users, Timer } from "lucide-react";
+import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Code2, Sparkles } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLocation } from "wouter"; 
 import ParticlesBackground from "@/components/ParticlesBackground";
@@ -38,7 +38,7 @@ export default function Home() {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
-  // INICIALIZAÇÃO DO LENIS VIA CDN (BLINDADO CONTRA ERROS)
+  // INICIALIZAÇÃO DO LENIS VIA CDN
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://unpkg.com/lenis@1.1.18/dist/lenis.min.js";
@@ -137,7 +137,7 @@ export default function Home() {
       >
         <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-teal-500">Overthure Tech</h1>
+            <h1 className="text-2xl font-bold text-teal-500">Overthure</h1>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
@@ -151,7 +151,14 @@ export default function Home() {
             ].map((item) => (
               <motion.button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                // ALTERAÇÃO AQUI: Se for 'contato', muda a rota. Se não, faz o scroll.
+                onClick={() => {
+                    if (item.id === 'contato') {
+                        setLocation("/contato-form");
+                    } else {
+                        scrollToSection(item.id);
+                    }
+                }}
                 initial="initial"
                 whileHover="hover"
                 className="group relative py-2 text-sm font-medium overflow-hidden"
@@ -222,13 +229,12 @@ export default function Home() {
         </div>
       </motion.nav>
 
-      {/* HERO SECTION COM EFEITO DE DIMINUIÇÃO (SCALE DOWN) */}
+      {/* HERO SECTION */}
       <section ref={heroRef} className="relative h-[150vh] z-10">
         <motion.div 
           style={{ scale, opacity }}
           className="sticky top-0 h-screen flex items-center justify-center overflow-hidden pt-20"
         >
-          {/* Background Blobs Animados */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
               animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -262,7 +268,6 @@ export default function Home() {
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                {/* Botão 1: Leva ao Portfólio (conforme pedido anterior) */}
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
                   size="lg" 
@@ -271,8 +276,6 @@ export default function Home() {
                   Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
 
-                {/* Botão 2: SEJA UM INVESTIDOR (ALTERAÇÃO AQUI) */}
-                {/* Encaminha para a nova rota /investidor */}
                 <Button 
                   onClick={() => setLocation("/investidor")} 
                   size="lg" 
@@ -553,14 +556,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contato */}
+      {/* Contato (Footer area, mantido para visualização, mas a ação principal está no topo) */}
       <section id="contato" className="py-24 bg-card/30 relative z-10">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto text-center space-y-8">
             <h2 className="text-4xl md:text-5xl font-bold">Entre em Contato</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
               <a href="mailto:contato@overthuretech.com" className="flex items-center gap-2 text-white hover:text-teal-500 transition-colors">
-                <Mail className="h-5 w-5 text-white" /> <span>contato@overthure.com</span>
+                <Mail className="h-5 w-5 text-white" /> <span>contato@overthuretech.com</span>
               </a>
               <div className="flex items-center gap-4">
                 <Instagram className="h-6 w-6 text-white cursor-pointer hover:text-teal-500 transition-colors" />

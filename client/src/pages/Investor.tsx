@@ -114,7 +114,7 @@ export default function Investor() {
               <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Investidores</span>
               <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
                 {/* ALTERAÇÃO AQUI: Cor alterada para text-teal-500 */}
-                Impulsione o Futuro com a <span className="text-teal-500">Overthure Tech</span>
+                Impulsione o Futuro com a <span className="text-teal-500">Overthure</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Estamos construindo a próxima geração de infraestrutura digital. Junte-se a nós nesta jornada e faça parte de um portfólio de alta performance.

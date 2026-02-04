@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Send, CheckCircle2, Mail, MapPin, Sparkles, Code2, Rocket } from "lucide-react";
@@ -9,12 +9,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import ParticlesBackground from "@/components/ParticlesBackground";
+import emailjs from "@emailjs/browser"; 
 
 export default function ContatoForm() {
   const [, setLocation] = useLocation();
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  const formRef = useRef<HTMLFormElement>(null);
+
   // --- LÓGICA DA BARRA DE ROLAGEM ---
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -25,7 +28,7 @@ export default function ContatoForm() {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setIsScrolling(false);
-      }, 1000); // Some após 1 segundo sem rolar
+      }, 1000); 
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -58,24 +61,49 @@ export default function ContatoForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     if (selectedServices.length === 0) {
       toast.error("Por favor, selecione pelo menos um serviço.");
       return;
     }
     if (!selectedBudget || !hasDeadline) {
-      toast.error("Preencha todos os campos de seleção.");
+      toast.error("Preencha todos os campos de seleção (Orçamento e Prazo).");
       return;
     }
 
     setIsSubmitting(true);
 
-    // Simulação de envio
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-      toast.success("Briefing enviado com sucesso!");
-      setTimeout(() => setLocation("/"), 5000); 
-    }, 2000);
+    // --- INTEGRAÇÃO EMAILJS ---
+    const form = formRef.current;
+    
+    const templateParams = {
+        from_name: form?.firstName.value,
+        from_email: form?.email.value,
+        website: form?.website.value || "Não informado",
+        message: form?.message.value,
+        services: selectedServices.join(", "),
+        budget: selectedBudget,
+        deadline: hasDeadline === "sim" ? form?.deadlineDate.value : hasDeadline === "urgente" ? "Urgente" : "Sem prazo definido"
+    };
+
+    const SERVICE_ID = "service_9jrlhhh";   
+    const TEMPLATE_ID = "template_tsd065c"; 
+    const PUBLIC_KEY = "UQ-1Pjv_78A_IEebC";   
+
+    try {
+        await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+        
+        setIsSubmitting(false);
+        setSubmitted(true);
+        toast.success("Briefing enviado com sucesso! Entraremos em contato.");
+        
+        setTimeout(() => setLocation("/"), 5000);
+
+    } catch (error) {
+        console.error("Erro EmailJS:", error);
+        setIsSubmitting(false);
+        toast.error("Erro ao enviar. Por favor, verifique sua conexão ou tente mais tarde.");
+    }
   };
 
   const fadeInUp = {
@@ -84,7 +112,6 @@ export default function ContatoForm() {
     transition: { duration: 0.6 }
   };
 
-  // Estilo dos "Chips" de seleção
   const chipStyle = (isSelected: boolean) => `
     px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-md border transition-all duration-300
     ${isSelected 
@@ -96,7 +123,6 @@ export default function ContatoForm() {
   return (
     <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
       
-      {/* --- ESTILO DINÂMICO DA SCROLLBAR --- */}
       <style dangerouslySetInnerHTML={{ __html: `
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -105,8 +131,6 @@ export default function ContatoForm() {
           border-radius: 10px; 
           transition: background 0.3s; 
         }
-        
-        /* Firefox */
         html {
           scrollbar-width: thin;
           scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
@@ -114,13 +138,11 @@ export default function ContatoForm() {
         }
       `}} />
       
-      {/* Background animado */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
         <ParticlesBackground />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-12">
-        {/* Botão Voltar */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -132,11 +154,10 @@ export default function ContatoForm() {
 
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           
-          {/* COLUNA ESQUERDA: Informações e Contexto */}
+          {/* Coluna Esquerda */}
           <div className="space-y-12">
             <motion.div variants={fadeInUp} initial="initial" animate="animate">
               <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Contato</span>
-              {/* ALTERAÇÃO AQUI: "Incrível" agora está em text-teal-500 */}
               <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
                 Vamos Construir Algo <span className="text-teal-500">Incrível</span> Juntos?
               </h1>
@@ -145,7 +166,6 @@ export default function ContatoForm() {
               </p>
             </motion.div>
 
-            {/* Lista de Motivos / Diferenciais Rápidos */}
             <div className="grid gap-6">
               {[
                 { icon: Sparkles, title: "Design Exclusivo", desc: "Criamos identidades visuais únicas que destacam sua marca." },
@@ -173,11 +193,11 @@ export default function ContatoForm() {
               ))}
             </div>
 
-            {/* Informações de Contato Estáticas */}
             <div className="pt-8 border-t border-white/10 space-y-4">
               <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
                 <Mail className="w-5 h-5 text-teal-500" />
-                <span>contato@overthuretech.com</span>
+                {/* E-MAIL CORRIGIDO AQUI */}
+                <span>contato@overthure.com</span>
               </div>
               <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
                 <MapPin className="w-5 h-5 text-teal-500" />
@@ -186,7 +206,7 @@ export default function ContatoForm() {
             </div>
           </div>
 
-          {/* COLUNA DIREITA: Formulário (Sticky) */}
+          {/* Coluna Direita (Formulário) */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,7 +218,7 @@ export default function ContatoForm() {
               
               <CardContent className="p-8">
                 {!submitted ? (
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                       <h2 className="text-2xl font-bold text-white">Briefing do Projeto</h2>
                       <p className="text-muted-foreground text-sm">
@@ -209,15 +229,14 @@ export default function ContatoForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Nome Completo</Label>
-                        <Input required placeholder="Seu nome" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                        <Input name="firstName" required placeholder="Seu nome" className="bg-white/5 border-white/10 focus:border-teal-500" />
                       </div>
                       <div className="space-y-2">
                         <Label>E-mail</Label>
-                        <Input required type="email" placeholder="seu@email.com" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                        <Input name="email" required type="email" placeholder="seu@email.com" className="bg-white/5 border-white/10 focus:border-teal-500" />
                       </div>
                     </div>
 
-                    {/* Seleção de Serviços */}
                     <div className="space-y-3">
                       <Label>Quais serviços você precisa?</Label>
                       <div className="flex flex-wrap gap-2">
@@ -231,10 +250,9 @@ export default function ContatoForm() {
 
                     <div className="space-y-2">
                       <Label>URL Atual (Opcional)</Label>
-                      <Input placeholder="https://www.seusite.com.br" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                      <Input name="website" placeholder="https://www.seusite.com.br" className="bg-white/5 border-white/10 focus:border-teal-500" />
                     </div>
 
-                    {/* Orçamento e Prazo */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-3">
                         <Label>Orçamento Estimado</Label>
@@ -259,11 +277,10 @@ export default function ContatoForm() {
                       </div>
                     </div>
 
-                    {/* Input Condicional de Prazo */}
                     <AnimatePresence>
                       {hasDeadline === "sim" && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                          <Input required placeholder="Qual a data limite desejada?" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                          <Input name="deadlineDate" required placeholder="Qual a data limite desejada?" className="bg-white/5 border-white/10 focus:border-teal-500" />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -271,6 +288,7 @@ export default function ContatoForm() {
                     <div className="space-y-2">
                       <Label>Resumo do Projeto (Briefing)</Label>
                       <Textarea 
+                        name="message"
                         required 
                         rows={4} 
                         placeholder="Descreva os objetivos, público-alvo e funcionalidades principais..." 
@@ -291,7 +309,6 @@ export default function ContatoForm() {
                     </Button>
                   </form>
                 ) : (
-                  // TELA DE SUCESSO
                   <div className="text-center py-20 space-y-6">
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
                       <CheckCircle2 className="h-24 w-24 text-teal-500 mx-auto" />
