@@ -7,7 +7,8 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import PortfolioPage from "./pages/PortfolioPage";
 import ContatoForm from "./pages/ContatoForm"; 
-import Investor from "./pages/Investor"; // 1. Importação adicionada
+import Investor from "./pages/Investor";
+import ProjectDetails from "./pages/ProjectDetails"; // 1. IMPORTAÇÃO DA NOVA PÁGINA
 
 function Router() {
   const [, setLocation] = useLocation();
@@ -16,8 +17,10 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       
-      {/* 2. Rota para Investidor adicionada */}
       <Route path="/investidor" component={Investor} />
+
+      {/* 2. ROTA DINÂMICA ADICIONADA (Obrigatória para os cards funcionarem) */}
+      <Route path="/project/:id" component={ProjectDetails} />
 
       {/* Rota para o Portfólio Completo */}
       <Route path="/portfolio">

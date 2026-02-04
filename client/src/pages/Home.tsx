@@ -137,7 +137,7 @@ export default function Home() {
       >
         <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-teal-500">Overthure</h1>
+            <h1 className="text-2xl font-bold text-teal-500">Overthure Tech</h1>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
@@ -151,7 +151,6 @@ export default function Home() {
             ].map((item) => (
               <motion.button
                 key={item.id}
-                // ALTERAÇÃO AQUI: Se for 'contato', muda a rota. Se não, faz o scroll.
                 onClick={() => {
                     if (item.id === 'contato') {
                         setLocation("/contato-form");
@@ -303,6 +302,9 @@ export default function Home() {
             <p className="text-lg text-muted-foreground leading-relaxed">
               A Overthure Tech nasceu da visão de transformar ideias ousadas em reality tecnológica. O trabalho desenvolvido caracteriza-se por uma vision multidisciplinar, integrando pesquisa e engenharia para criar soluções à prova de futuro.
             </p>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Nossa base metodológica já se encontra validada e pronta para gerar soluções de excelência global.
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -345,11 +347,12 @@ export default function Home() {
         <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
       </motion.div>
 
-      {/* CARDS ALTERADOS PARA O DESIGN DA IMAGEM */}
+      {/* CARDS COM REDIRECIONAMENTO ADICIONADO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
         
         {/* Card 1: Abela Mielo */}
         <motion.div 
+          onClick={() => setLocation("/project/abela-mielo")} // Encaminha para o projeto Abela Mielo
           initial={{ opacity: 0, y: 20 }} 
           whileInView={{ opacity: 1, y: 0 }} 
           whileHover={{ y: -10 }}
@@ -374,6 +377,7 @@ export default function Home() {
 
         {/* Card 2: Core Engine */}
         <motion.div 
+          onClick={() => setLocation("/project/core-engine")} // Encaminha para o projeto Core Engine
           initial={{ opacity: 0, y: 40 }} 
           whileInView={{ opacity: 1, y: 20 }} 
           whileHover={{ y: 10 }}
@@ -553,7 +557,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contato (Footer area, mantido para visualização, mas a ação principal está no topo) */}
+      {/* Contato */}
       <section id="contato" className="py-24 bg-card/30 relative z-10">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto text-center space-y-8">
