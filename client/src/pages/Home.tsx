@@ -228,6 +228,7 @@ export default function Home() {
           style={{ scale, opacity }}
           className="sticky top-0 h-screen flex items-center justify-center overflow-hidden pt-20"
         >
+          {/* Background Blobs Animados */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
               animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -261,11 +262,22 @@ export default function Home() {
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                {/* BOTÃO ATUALIZADO AQUI: Redireciona para 'portfolio' */}
-                <Button onClick={() => scrollToSection('portfolio')} size="lg" className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group">
+                {/* Botão 1: Leva ao Portfólio (conforme pedido anterior) */}
+                <Button 
+                  onClick={() => scrollToSection('portfolio')} 
+                  size="lg" 
+                  className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group"
+                >
                   Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button size="lg" className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors">
+
+                {/* Botão 2: SEJA UM INVESTIDOR (ALTERAÇÃO AQUI) */}
+                {/* Encaminha para a nova rota /investidor */}
+                <Button 
+                  onClick={() => setLocation("/investidor")} 
+                  size="lg" 
+                  className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors"
+                >
                   Seja um Investidor
                 </Button>
               </motion.div>
@@ -548,7 +560,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold">Entre em Contato</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
               <a href="mailto:contato@overthuretech.com" className="flex items-center gap-2 text-white hover:text-teal-500 transition-colors">
-                <Mail className="h-5 w-5 text-white" /> <span>contato@overthuretech.com</span>
+                <Mail className="h-5 w-5 text-white" /> <span>contato@overthure.com</span>
               </a>
               <div className="flex items-center gap-4">
                 <Instagram className="h-6 w-6 text-white cursor-pointer hover:text-teal-500 transition-colors" />

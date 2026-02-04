@@ -6,7 +6,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import PortfolioPage from "./pages/PortfolioPage";
-import ContatoForm from "./pages/ContatoForm"; // Certifique-se de criar este arquivo na pasta pages
+import ContatoForm from "./pages/ContatoForm"; 
+import Investor from "./pages/Investor"; // 1. Importação adicionada
 
 function Router() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,9 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       
+      {/* 2. Rota para Investidor adicionada */}
+      <Route path="/investidor" component={Investor} />
+
       {/* Rota para o Portfólio Completo */}
       <Route path="/portfolio">
         {() => (
