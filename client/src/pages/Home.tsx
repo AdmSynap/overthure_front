@@ -5,7 +5,7 @@ import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldC
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLocation } from "wouter";
 
-// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (CORES EM CINZA CLARO) ---
+// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (6 FACES, CINZA, TAMANHO 260) ---
 const BinaryCube = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -26,13 +26,13 @@ const BinaryCube = () => {
     window.addEventListener('resize', updateSize);
 
     // --- Configurações do Cubo ---
-    const size = 120; 
-    const perspective = 800; 
-    const barThickness = 14; 
+    const size = 260; 
+    const perspective = 1000; 
+    const barThickness = 18; 
     
     // Paleta de Cinzas
-    const colorLightGray = "#d1d5db"; // Cinza claro principal
-    const colorMediumGray = "#9ca3af"; // Cinza para o "highlight" sutil
+    const colorLightGray = "#d1d5db"; 
+    const colorMediumGray = "#9ca3af"; 
 
     const shrink = 0.88; 
     const offset = 1.05; 
@@ -56,7 +56,7 @@ const BinaryCube = () => {
       },
       { // Esquerda
         color: colorLightGray,
-        highlight: true, // Mantemos a lógica de highlight mas com cor cinza
+        highlight: true, 
         verts: [
           {x: -offset, y: -shrink, z: -shrink}, {x: -offset, y: shrink, z: -shrink},
           {x: -offset, y: shrink, z: shrink}, {x: -offset, y: -shrink, z: shrink}
@@ -103,7 +103,7 @@ const BinaryCube = () => {
         const z1 = v.z * Math.cos(angleY) + v.x * Math.sin(angleY);
         const y2 = v.y * Math.cos(angleX) - z1 * Math.sin(angleX);
         const z2 = z1 * Math.cos(angleX) + v.y * Math.sin(angleX);
-        const scale = perspective / (perspective + z2 * size + 400);
+        const scale = perspective / (perspective + z2 * size + 500);
         return {
             x: x1 * size * scale + cx,
             y: y2 * size * scale + cy,
@@ -145,7 +145,6 @@ const BinaryCube = () => {
         const projBarVerts = barVerts.map(v => project(v, cx, cy));
         const bFaces = [[0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [0, 1, 2, 3], [4, 5, 6, 7]];
 
-        // Estilos em Cinza
         const color = isHighlight ? colorMediumGray : colorLightGray;
         const faceColor = "rgba(209, 213, 219, 0.15)";
         const edgeColor = "rgba(209, 213, 219, 0.4)";
@@ -180,7 +179,7 @@ const BinaryCube = () => {
                 ctx.translate(cxF, cyF);
                 ctx.rotate(ang);
                 const sAvg = (p0.scale + p2.scale) / 2;
-                const fSize = Math.max(7, (barThickness - 3) * sAvg);
+                const fSize = Math.max(9, (barThickness - 4) * sAvg);
                 ctx.fillStyle = color;
                 ctx.font = `${fSize}px monospace`;
                 ctx.textAlign = "center";
@@ -197,8 +196,8 @@ const BinaryCube = () => {
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
 
-        angleX += 0.004;
-        angleY += 0.007;
+        angleX += 0.003;
+        angleY += 0.005;
 
         const barsToDraw: any[] = [];
         faces.forEach(face => {
@@ -226,7 +225,7 @@ const BinaryCube = () => {
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-        <canvas ref={canvasRef} className="block" />
+        <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );
 };
@@ -440,10 +439,16 @@ export default function Home() {
       </motion.nav>
 
       {/* HERO SECTION */}
-      <section ref={heroRef} className="relative min-h-[100vh] flex items-center z-10 pt-20">
+      <section ref={heroRef} className="relative min-h-[110vh] flex items-center justify-center z-10 pt-20 overflow-hidden">
+        
+        {/* CUBO EM POSIÇÃO ABSOLUTA NO CANTO DIREITO INFERIOR */}
+        <div className="absolute bottom-0 right-[-180px] lg:bottom-10 lg:right-[-120px] w-[500px] h-[500px] lg:w-[850px] lg:h-[850px] pointer-events-none z-0 opacity-40 lg:opacity-70">
+           <BinaryCube />
+        </div>
+
         <motion.div 
           style={{ scale, opacity }}
-          className="w-full"
+          className="w-full relative z-10 -mt-48"
         >
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
@@ -458,56 +463,43 @@ export default function Home() {
             />
           </div>
           
-          <div className="container relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="container relative">
+            <motion.div
+              initial="initial"
+              animate="animate"
+              variants={staggerContainer}
+              className="space-y-8 text-center max-w-4xl mx-auto"
+            >
+              <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-teal-500/10 border border-teal-500/20 rounded-full mb-4">
+                <span className="text-teal-500 text-sm font-medium">Inovação que Transforma o Futuro</span>
+              </motion.div>
               
-              <motion.div
-                initial="initial"
-                animate="animate"
-                variants={staggerContainer}
-                className="space-y-8 text-center lg:text-left order-2 lg:order-1"
-              >
-                <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-teal-500/10 border border-teal-500/20 rounded-full mb-4">
-                  <span className="text-teal-500 text-sm font-medium">Inovação que Transforma o Futuro</span>
-                </motion.div>
-                
-                <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold leading-tight">
-                  Desenvolvendo o <span className="bg-gradient-to-r from-teal-400 via-teal-500 to-teal-700 bg-clip-text text-transparent">Amanhã</span> com Tecnologia de Ponta
-                </motion.h1>
-                
-                <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
-                  Com foco e dedicação à pesquisa e desenvolvimento de soluções inovadoras que revolucionam indústrias e criam valor sustentável.
-                </motion.p>
-                
-                <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center lg:items-start gap-4 pt-4">
-                  <Button 
-                    onClick={() => scrollToSection('portfolio')} 
-                    size="lg" 
-                    className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group w-full sm:w-auto"
-                  >
-                    Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+              <motion.h1 variants={fadeInUp} className="text-4xl md:text-7xl font-bold leading-tight">
+                Desenvolvendo o <span className="bg-gradient-to-r from-teal-400 via-teal-500 to-teal-700 bg-clip-text text-transparent">Amanhã</span> com Tecnologia de Ponta
+              </motion.h1>
+              
+              <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+                Com foco e dedicação à pesquisa e desenvolvimento de soluções inovadoras que revolucionam indústrias e criam valor sustentável.
+              </motion.p>
+              
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <Button 
+                  onClick={() => scrollToSection('portfolio')} 
+                  size="lg" 
+                  className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group w-full sm:w-auto"
+                >
+                  Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
 
-                  <Button 
-                    onClick={() => setLocation("/investidor")} 
-                    size="lg" 
-                    className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors w-full sm:w-auto"
-                  >
-                    Seja um Investidor
-                  </Button>
-                </motion.div>
+                <Button 
+                  onClick={() => setLocation("/investidor")} 
+                  size="lg" 
+                  className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors w-full sm:w-auto"
+                >
+                  Seja um Investidor
+                </Button>
               </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1 }}
-                className="h-[400px] flex items-center justify-center order-1 lg:order-2"
-              >
-                 <BinaryCube />
-              </motion.div>
-
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </section>
@@ -586,7 +578,7 @@ export default function Home() {
                   <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
                   <div className="flex items-center justify-between">
                     <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
-                    <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 group-hover:text-black transition-all duration-300">
+                    <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 transition-all">
                       <ArrowRight className="w-5 h-5 -rotate-45" />
                     </div>
                   </div>
@@ -607,7 +599,7 @@ export default function Home() {
                   <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
                   <div className="flex items-center justify-between">
                     <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
-                    <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 group-hover:text-black transition-all duration-300">
+                    <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 transition-all">
                       <ArrowRight className="w-5 h-5 -rotate-45" />
                     </div>
                   </div>
