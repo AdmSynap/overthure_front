@@ -3,8 +3,234 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Code2, Sparkles } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useLocation } from "wouter"; 
-import ParticlesBackground from "@/components/ParticlesBackground";
+import { useLocation } from "wouter";
+
+// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (CORES EM CINZA CLARO) ---
+const BinaryCube = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const updateSize = () => {
+        if(canvas.parentElement) {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+
+    // --- Configurações do Cubo ---
+    const size = 120; 
+    const perspective = 800; 
+    const barThickness = 14; 
+    
+    // Paleta de Cinzas
+    const colorLightGray = "#d1d5db"; // Cinza claro principal
+    const colorMediumGray = "#9ca3af"; // Cinza para o "highlight" sutil
+
+    const shrink = 0.88; 
+    const offset = 1.05; 
+
+    const faces = [
+      { // Frente
+        color: colorLightGray,
+        highlight: false,
+        verts: [
+          {x: -shrink, y: -shrink, z: -offset}, {x: shrink, y: -shrink, z: -offset},
+          {x: shrink, y: shrink, z: -offset}, {x: -shrink, y: shrink, z: -offset}
+        ]
+      },
+      { // Trás
+        color: colorLightGray,
+        highlight: false,
+        verts: [
+          {x: -shrink, y: -shrink, z: offset}, {x: shrink, y: -shrink, z: offset},
+          {x: shrink, y: shrink, z: offset}, {x: -shrink, y: shrink, z: offset}
+        ]
+      },
+      { // Esquerda
+        color: colorLightGray,
+        highlight: true, // Mantemos a lógica de highlight mas com cor cinza
+        verts: [
+          {x: -offset, y: -shrink, z: -shrink}, {x: -offset, y: shrink, z: -shrink},
+          {x: -offset, y: shrink, z: shrink}, {x: -offset, y: -shrink, z: shrink}
+        ]
+      },
+      { // Direita
+        color: colorLightGray,
+        highlight: false,
+        verts: [
+          {x: offset, y: -shrink, z: -shrink}, {x: offset, y: shrink, z: -shrink},
+          {x: offset, y: shrink, z: shrink}, {x: offset, y: -shrink, z: shrink}
+        ]
+      },
+      { // Topo
+        color: colorLightGray,
+        highlight: false,
+        verts: [
+          {x: -shrink, y: -offset, z: -shrink}, {x: shrink, y: -offset, z: -shrink},
+          {x: shrink, y: -offset, z: shrink}, {x: -shrink, y: -offset, z: shrink}
+        ]
+      },
+      { // Base
+        color: colorLightGray,
+        highlight: false,
+        verts: [
+          {x: -shrink, y: offset, z: -shrink}, {x: shrink, y: offset, z: -shrink},
+          {x: shrink, y: offset, z: shrink}, {x: -shrink, y: offset, z: shrink}
+        ]
+      }
+    ];
+
+    let angleX = 0;
+    let angleY = 0;
+    let animationFrameId: number;
+
+    const getBinaryString = (length: number) => {
+        let str = "";
+        for(let i=0; i<length; i++) str += Math.random() > 0.5 ? "1" : "0";
+        return str;
+    };
+
+    const project = (v: {x: number, y: number, z: number}, cx: number, cy: number) => {
+        const x1 = v.x * Math.cos(angleY) - v.z * Math.sin(angleY);
+        const z1 = v.z * Math.cos(angleY) + v.x * Math.sin(angleY);
+        const y2 = v.y * Math.cos(angleX) - z1 * Math.sin(angleX);
+        const z2 = z1 * Math.cos(angleX) + v.y * Math.sin(angleX);
+        const scale = perspective / (perspective + z2 * size + 400);
+        return {
+            x: x1 * size * scale + cx,
+            y: y2 * size * scale + cy,
+            z: z2,
+            scale: scale 
+        };
+    };
+
+    const drawBar3D = (v1: {x:number, y:number, z:number}, v2: {x:number, y:number, z:number}, isHighlight: boolean, cx: number, cy: number) => {
+        const dx = v2.x - v1.x;
+        const dy = v2.y - v1.y;
+        const dz = v2.z - v1.z;
+        const len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        if (len < 0.01) return;
+
+        const ux = dx/len, uy = dy/len, uz = dz/len;
+        let up = {x:0, y:1, z:0};
+        if (Math.abs(uy) > 0.9) up = {x:1, y:0, z:0};
+        
+        const sx = up.y*uz - up.z*uy;
+        const sy = up.z*ux - up.x*uz;
+        const sz = up.x*uy - up.y*ux;
+        const slen = Math.sqrt(sx*sx + sy*sy + sz*sz);
+        const sideX = sx/slen, sideY = sy/slen, sideZ = sz/slen;
+        const topX = uy*sideZ - uz*sideY;
+        const topY = uz*sideX - ux*sideZ;
+        const topZ = ux*sideY - uy*sideX;
+
+        const w = barThickness / (size * 2);
+        const barVerts = [];
+        for(let i=0; i<2; i++) {
+            const p = i===0 ? v1 : v2;
+            barVerts.push({x: p.x - sideX*w + topX*w, y: p.y - sideY*w + topY*w, z: p.z - sideZ*w + topZ*w});
+            barVerts.push({x: p.x + sideX*w + topX*w, y: p.y + sideY*w + topY*w, z: p.z + sideZ*w + topZ*w});
+            barVerts.push({x: p.x + sideX*w - topX*w, y: p.y + sideY*w - topY*w, z: p.z + sideZ*w - topZ*w});
+            barVerts.push({x: p.x - sideX*w - topX*w, y: p.y - sideY*w - topY*w, z: p.z - sideZ*w - topZ*w});
+        }
+
+        const projBarVerts = barVerts.map(v => project(v, cx, cy));
+        const bFaces = [[0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [0, 1, 2, 3], [4, 5, 6, 7]];
+
+        // Estilos em Cinza
+        const color = isHighlight ? colorMediumGray : colorLightGray;
+        const faceColor = "rgba(209, 213, 219, 0.15)";
+        const edgeColor = "rgba(209, 213, 219, 0.4)";
+
+        bFaces.sort((a, b) => {
+            const zA = (projBarVerts[a[0]].z + projBarVerts[a[1]].z + projBarVerts[a[2]].z + projBarVerts[a[3]].z) / 4;
+            const zB = (projBarVerts[b[0]].z + projBarVerts[b[1]].z + projBarVerts[b[2]].z + projBarVerts[b[3]].z) / 4;
+            return zB - zA;
+        });
+
+        bFaces.forEach((f, idx) => {
+            const p0 = projBarVerts[f[0]], p1 = projBarVerts[f[1]], p2 = projBarVerts[f[2]], p3 = projBarVerts[f[3]];
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+            ctx.closePath();
+            ctx.fillStyle = idx > 3 ? color : faceColor;
+            ctx.fill();
+
+            if (idx <= 3) {
+                ctx.strokeStyle = edgeColor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.clip(); 
+                const cxF = (p0.x + p1.x + p2.x + p3.x) / 4;
+                const cyF = (p0.y + p1.y + p2.y + p3.y) / 4;
+                const d01 = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+                const d12 = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                let ang = d01 > d12 ? Math.atan2(p1.y - p0.y, p1.x - p0.x) : Math.atan2(p2.y - p1.y, p2.x - p1.x);
+                if (Math.abs(ang) > Math.PI / 2) ang += Math.PI;
+                ctx.translate(cxF, cyF);
+                ctx.rotate(ang);
+                const sAvg = (p0.scale + p2.scale) / 2;
+                const fSize = Math.max(7, (barThickness - 3) * sAvg);
+                ctx.fillStyle = color;
+                ctx.font = `${fSize}px monospace`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const nChars = Math.max(3, Math.floor((d01 > d12 ? d01 : d12) / (fSize * 0.6)));
+                ctx.fillText(getBinaryString(nChars), 0, fSize * 0.1);
+                ctx.restore();
+            }
+        });
+    };
+
+    const animate = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        angleX += 0.004;
+        angleY += 0.007;
+
+        const barsToDraw: any[] = [];
+        faces.forEach(face => {
+          for(let i=0; i<4; i++) {
+            const v1 = face.verts[i];
+            const v2 = face.verts[(i+1)%4];
+            const midZ = (project(v1, cx, cy).z + project(v2, cx, cy).z) / 2;
+            barsToDraw.push({ v1, v2, highlight: face.highlight, z: midZ });
+          }
+        });
+
+        barsToDraw.sort((a, b) => b.z - a.z);
+        barsToDraw.forEach(bar => drawBar3D(bar.v1, bar.v2, bar.highlight, cx, cy));
+
+        animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+        window.removeEventListener('resize', updateSize);
+        cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+        <canvas ref={canvasRef} className="block" />
+    </div>
+  );
+};
+// --- FIM DO COMPONENTE CUBO BINÁRIO ---
 
 const WhatsappIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -25,20 +251,17 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 export default function Home() {
   const [, setLocation] = useLocation();
   const [isScrolling, setIsScrolling] = useState(false);
-  const lenisRef = useRef<any>(null); // Referência para o Lenis
+  const lenisRef = useRef<any>(null);
   
-  // Ref para controlar o scroll da Hero
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
   });
 
-  // Transformações: de 100% para 70% de escala e de 1 para 0 de opacidade
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
-  // INICIALIZAÇÃO DO LENIS VIA CDN
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://unpkg.com/lenis@1.1.18/dist/lenis.min.js";
@@ -109,13 +332,7 @@ export default function Home() {
   return (
     <div className={`min-h-screen bg-background text-foreground ${isScrolling ? 'scrolling' : 'idle'}`}>
       
-      {/* Partículas Fixas ao fundo */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <ParticlesBackground />
-      </div>
-
       <style dangerouslySetInnerHTML={{ __html: `
-        /* Configuração obrigatória para o Lenis */
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
@@ -162,7 +379,6 @@ export default function Home() {
                 whileHover="hover"
                 className="group relative py-2 text-sm font-medium overflow-hidden"
               >
-                {/* Container das Letras */}
                 <div className="relative flex overflow-hidden">
                   {item.label.split("").map((char, index) => (
                     <span 
@@ -170,7 +386,6 @@ export default function Home() {
                       className="relative inline-block"
                       style={{ minWidth: char === " " ? "0.4em" : "auto" }}
                     >
-                      {/* Letra Original (Branca) - Sobe para sair */}
                       <motion.span
                         variants={{
                           initial: { y: 0 },
@@ -185,8 +400,6 @@ export default function Home() {
                       >
                         {char}
                       </motion.span>
-
-                      {/* Letra Azul Turquesa - Sobe para entrar */}
                       <motion.span
                         variants={{
                           initial: { y: "100%" },
@@ -204,8 +417,6 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
-
-                {/* Linha Azul Turquesa animada */}
                 <motion.span 
                   variants={{
                     initial: { scaleX: 0 },
@@ -229,12 +440,12 @@ export default function Home() {
       </motion.nav>
 
       {/* HERO SECTION */}
-      <section ref={heroRef} className="relative h-[150vh] z-10">
+      <section ref={heroRef} className="relative min-h-[100vh] flex items-center z-10 pt-20">
         <motion.div 
           style={{ scale, opacity }}
-          className="sticky top-0 h-screen flex items-center justify-center overflow-hidden pt-20"
+          className="w-full"
         >
-          <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
               animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -248,42 +459,55 @@ export default function Home() {
           </div>
           
           <div className="container relative z-10">
-            <motion.div
-              initial="initial"
-              animate="animate"
-              variants={staggerContainer}
-              className="max-w-4xl mx-auto text-center space-y-8"
-            >
-              <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-teal-500/10 border border-teal-500/20 rounded-full mb-4">
-                <span className="text-teal-500 text-sm font-medium">Inovação que Transforma o Futuro</span>
-              </motion.div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               
-              <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold leading-tight">
-                Desenvolvendo o <span className="bg-gradient-to-r from-teal-400 via-teal-500 to-teal-700 bg-clip-text text-transparent">Amanhã</span> com Tecnologia de Ponta
-              </motion.h1>
-              
-              <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-                Com foco e dedicação à pesquisa e desenvolvimento de soluções inovadoras que revolucionam indústrias e criam valor sustentável.
-              </motion.p>
-              
-              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <Button 
-                  onClick={() => scrollToSection('portfolio')} 
-                  size="lg" 
-                  className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group"
-                >
-                  Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+              <motion.div
+                initial="initial"
+                animate="animate"
+                variants={staggerContainer}
+                className="space-y-8 text-center lg:text-left order-2 lg:order-1"
+              >
+                <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-teal-500/10 border border-teal-500/20 rounded-full mb-4">
+                  <span className="text-teal-500 text-sm font-medium">Inovação que Transforma o Futuro</span>
+                </motion.div>
+                
+                <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold leading-tight">
+                  Desenvolvendo o <span className="bg-gradient-to-r from-teal-400 via-teal-500 to-teal-700 bg-clip-text text-transparent">Amanhã</span> com Tecnologia de Ponta
+                </motion.h1>
+                
+                <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+                  Com foco e dedicação à pesquisa e desenvolvimento de soluções inovadoras que revolucionam indústrias e criam valor sustentável.
+                </motion.p>
+                
+                <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center lg:items-start gap-4 pt-4">
+                  <Button 
+                    onClick={() => scrollToSection('portfolio')} 
+                    size="lg" 
+                    className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group w-full sm:w-auto"
+                  >
+                    Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
 
-                <Button 
-                  onClick={() => setLocation("/investidor")} 
-                  size="lg" 
-                  className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors"
-                >
-                  Seja um Investidor
-                </Button>
+                  <Button 
+                    onClick={() => setLocation("/investidor")} 
+                    size="lg" 
+                    className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors w-full sm:w-auto"
+                  >
+                    Seja um Investidor
+                  </Button>
+                </motion.div>
               </motion.div>
-            </motion.div>
+
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1 }}
+                className="h-[400px] flex items-center justify-center order-1 lg:order-2"
+              >
+                 <BinaryCube />
+              </motion.div>
+
+            </div>
           </div>
         </motion.div>
       </section>
@@ -300,7 +524,7 @@ export default function Home() {
           >
             <h2 className="text-4xl md:text-5xl font-bold">Sobre a Overthure Tech</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              A Overthure Tech nasceu da visão de transformar ideias ousadas em reality tecnológica. O trabalho desenvolvido caracteriza-se por uma vision multidisciplinar, integrando pesquisa e engenharia para criar soluções à prova de futuro.
+              A Overthure Tech nasceu da visão de transformar ideias ousadas em realidade tecnológica. O trabalho desenvolvido caracteriza-se por uma visão multidisciplinar, integrando pesquisa e engenharia para criar soluções à prova de futuro.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
               Nossa base metodológica já se encontra validada e pronta para gerar soluções de excelência global.
@@ -336,74 +560,63 @@ export default function Home() {
       </section>
 
       {/* Portfólio */}
-<section id="portfolio" className="py-24 bg-black relative z-10 overflow-hidden">
-  <div className="container relative z-10">
-    <div className="grid lg:grid-cols-2 gap-16 items-center">
-      <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
-          <Sparkles className="w-4 h-4" /> <span>Projetos Realizados</span>
+      <section id="portfolio" className="py-24 bg-black relative z-10 overflow-hidden">
+        <div className="container relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
+                <span className="flex items-center gap-1"><Sparkles className="w-4 h-4" /> Projetos Realizados</span>
+              </div>
+              <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
+              <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma seleção dos nossos melhores projetos.</p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+              <motion.div 
+                onClick={() => setLocation("/project/abela-mielo")}
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                whileHover={{ y: -10 }}
+                className="aspect-square rounded-[40px] border border-teal-500/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+              >
+                <div className="flex justify-end">
+                  <Code2 className="text-teal-500/40 w-10 h-10 group-hover:text-teal-400 transition-colors" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
+                  <div className="flex items-center justify-between">
+                    <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
+                    <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 group-hover:text-black transition-all duration-300">
+                      <ArrowRight className="w-5 h-5 -rotate-45" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                onClick={() => setLocation("/project/core-engine")}
+                initial={{ opacity: 0, y: 40 }} 
+                whileInView={{ opacity: 1, y: 20 }} 
+                whileHover={{ y: 10 }}
+                className="aspect-square rounded-[40px] border border-orange-600/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+              >
+                <div className="flex justify-end">
+                  <Sparkles className="text-orange-600/40 w-10 h-10 group-hover:text-orange-500 transition-colors" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
+                  <div className="flex items-center justify-between">
+                    <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
+                    <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 group-hover:text-black transition-all duration-300">
+                      <ArrowRight className="w-5 h-5 -rotate-45" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
-        <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
-        <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma selection dos nossos melhores projetos.</p>
-      </motion.div>
-
-      {/* CARDS COM REDIRECIONAMENTO ADICIONADO */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
-        
-        {/* Card 1: Abela Mielo */}
-        <motion.div 
-          onClick={() => setLocation("/project/abela-mielo")} // Encaminha para o projeto Abela Mielo
-          initial={{ opacity: 0, y: 20 }} 
-          whileInView={{ opacity: 1, y: 0 }} 
-          whileHover={{ y: -10 }}
-          className="aspect-square rounded-[40px] border border-teal-500/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
-        >
-          {/* Ícone Superior Direito */}
-          <div className="flex justify-end">
-            <Code2 className="text-teal-500/40 w-10 h-10 group-hover:text-teal-400 transition-colors" />
-          </div>
-          
-          {/* Conteúdo Inferior */}
-          <div>
-            <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
-            <div className="flex items-center justify-between">
-              <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
-              <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 group-hover:text-black transition-all duration-300">
-                <ArrowRight className="w-5 h-5 -rotate-45" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Card 2: Core Engine */}
-        <motion.div 
-          onClick={() => setLocation("/project/core-engine")} // Encaminha para o projeto Core Engine
-          initial={{ opacity: 0, y: 40 }} 
-          whileInView={{ opacity: 1, y: 20 }} 
-          whileHover={{ y: 10 }}
-          className="aspect-square rounded-[40px] border border-orange-600/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
-        >
-          {/* Ícone Superior Direito */}
-          <div className="flex justify-end">
-            <Sparkles className="text-orange-600/40 w-10 h-10 group-hover:text-orange-500 transition-colors" />
-          </div>
-
-          {/* Conteúdo Inferior */}
-          <div>
-            <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
-            <div className="flex items-center justify-between">
-              <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
-              <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 group-hover:text-black transition-all duration-300">
-                <ArrowRight className="w-5 h-5 -rotate-45" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* Áreas de Atuação */}
       <section id="areas" className="py-24 relative z-10">
@@ -451,17 +664,9 @@ export default function Home() {
       {/* Nossos Serviços */}
       <section id="servicos" className="py-24 bg-card/30 relative z-10">
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Nossos Serviços</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Suporte técnico especializado e consultoria estratégica.
-            </p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Suporte técnico especializado e consultoria estratégica.</p>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -482,7 +687,7 @@ export default function Home() {
                 viewport={{ once: false }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
-                className={`flex ${index === 6 ? 'lg:translate-x-[50%]' : ''} ${index === 7 ? 'lg:translate-x-[50%]' : ''}`}
+                className={`flex ${index === 6 || index === 7 ? 'lg:translate-x-[50%]' : ''}`}
               >
                 <Card className="p-8 bg-card border-teal-500/30 hover:border-orange-600/50 transition-all duration-300 group w-full flex flex-col">
                   <div className="w-16 h-16 bg-teal-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-orange-600/20 transition-colors shrink-0">
@@ -495,13 +700,7 @@ export default function Home() {
             ))}
           </div>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-16 text-center space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-16 text-center space-y-6">
             <p className="text-muted-foreground text-lg md:text-xl font-medium">Não encontrou o que procura? Entre em contato.</p>
             <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-all group px-8">
               Solicitar Orçamento <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -538,7 +737,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Seção Revolução */}
+      {/* Revolução */}
       <section className="py-24 relative overflow-hidden z-20 bg-background">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-r from-teal-500/15 via-transparent to-orange-600/15"></div>
