@@ -5,10 +5,9 @@ import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldC
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLocation } from "wouter";
 
-// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (6 FACES, CINZA, TAMANHO 260) ---
+// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (ESTRUTURA VAZADA APENAS COM CÓDIGO) ---
 const BinaryCube = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // Estados para o efeito de fumaça sob o cursor
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,12 +28,10 @@ const BinaryCube = () => {
     updateSize();
     window.addEventListener('resize', updateSize);
 
-    // --- Configurações do Cubo ---
     const size = 260; 
     const perspective = 1000; 
     const barThickness = 18; 
     
-    // Paleta de Cinzas
     const colorLightGray = "#d1d5db"; 
     const colorMediumGray = "#9ca3af"; 
 
@@ -42,54 +39,12 @@ const BinaryCube = () => {
     const offset = 1.05; 
 
     const faces = [
-      { // Frente
-        color: colorLightGray,
-        highlight: false,
-        verts: [
-          {x: -shrink, y: -shrink, z: -offset}, {x: shrink, y: -shrink, z: -offset},
-          {x: shrink, y: shrink, z: -offset}, {x: -shrink, y: shrink, z: -offset}
-        ]
-      },
-      { // Trás
-        color: colorLightGray,
-        highlight: false,
-        verts: [
-          {x: -shrink, y: -shrink, z: offset}, {x: shrink, y: -shrink, z: offset},
-          {x: shrink, y: shrink, z: offset}, {x: -shrink, y: shrink, z: offset}
-        ]
-      },
-      { // Esquerda
-        color: colorLightGray,
-        highlight: true, 
-        verts: [
-          {x: -offset, y: -shrink, z: -shrink}, {x: -offset, y: shrink, z: -shrink},
-          {x: -offset, y: shrink, z: shrink}, {x: -offset, y: -shrink, z: shrink}
-        ]
-      },
-      { // Direita
-        color: colorLightGray,
-        highlight: false,
-        verts: [
-          {x: offset, y: -shrink, z: -shrink}, {x: offset, y: shrink, z: -shrink},
-          {x: offset, y: shrink, z: shrink}, {x: offset, y: -shrink, z: shrink}
-        ]
-      },
-      { // Topo
-        color: colorLightGray,
-        highlight: false,
-        verts: [
-          {x: -shrink, y: -offset, z: -shrink}, {x: shrink, y: -offset, z: -shrink},
-          {x: shrink, y: -offset, z: shrink}, {x: -shrink, y: -offset, z: shrink}
-        ]
-      },
-      { // Base
-        color: colorLightGray,
-        highlight: false,
-        verts: [
-          {x: -shrink, y: offset, z: -shrink}, {x: shrink, y: offset, z: -shrink},
-          {x: shrink, y: offset, z: shrink}, {x: -shrink, y: offset, z: shrink}
-        ]
-      }
+      { color: colorLightGray, highlight: false, verts: [{x: -shrink, y: -shrink, z: -offset}, {x: shrink, y: -shrink, z: -offset}, {x: shrink, y: shrink, z: -offset}, {x: -shrink, y: shrink, z: -offset}] },
+      { color: colorLightGray, highlight: false, verts: [{x: -shrink, y: -shrink, z: offset}, {x: shrink, y: -shrink, z: offset}, {x: shrink, y: shrink, z: offset}, {x: -shrink, y: shrink, z: offset}] },
+      { color: colorLightGray, highlight: true,  verts: [{x: -offset, y: -shrink, z: -shrink}, {x: -offset, y: shrink, z: -shrink}, {x: -offset, y: shrink, z: shrink}, {x: -offset, y: -shrink, z: shrink}] },
+      { color: colorLightGray, highlight: false, verts: [{x: offset, y: -shrink, z: -shrink}, {x: offset, y: shrink, z: -shrink}, {x: offset, y: shrink, z: shrink}, {x: offset, y: -shrink, z: shrink}] },
+      { color: colorLightGray, highlight: false, verts: [{x: -shrink, y: -offset, z: -shrink}, {x: shrink, y: -offset, z: -shrink}, {x: shrink, y: -offset, z: shrink}, {x: -shrink, y: -offset, z: shrink}] },
+      { color: colorLightGray, highlight: false, verts: [{x: -shrink, y: offset, z: -shrink}, {x: shrink, y: offset, z: -shrink}, {x: shrink, y: offset, z: shrink}, {x: -shrink, y: offset, z: shrink}] }
     ];
 
     let angleX = 0;
@@ -150,8 +105,8 @@ const BinaryCube = () => {
         const bFaces = [[0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [0, 1, 2, 3], [4, 5, 6, 7]];
 
         const color = isHighlight ? colorMediumGray : colorLightGray;
-        const faceColor = "rgba(209, 213, 219, 0.15)";
-        const edgeColor = "rgba(209, 213, 219, 0.4)";
+        // Tornamos o preenchimento completamente transparente para focar apenas no binário
+        const edgeColor = "rgba(209, 213, 219, 0.2)";
 
         bFaces.sort((a, b) => {
             const zA = (projBarVerts[a[0]].z + projBarVerts[a[1]].z + projBarVerts[a[2]].z + projBarVerts[a[3]].z) / 4;
@@ -159,39 +114,44 @@ const BinaryCube = () => {
             return zB - zA;
         });
 
-        bFaces.forEach((f, idx) => {
+        bFaces.forEach((f) => {
             const p0 = projBarVerts[f[0]], p1 = projBarVerts[f[1]], p2 = projBarVerts[f[2]], p3 = projBarVerts[f[3]];
+            
+            // Desenha apenas o contorno (opcional, ajuda na forma 3D)
             ctx.beginPath();
             ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
             ctx.closePath();
-            ctx.fillStyle = idx > 3 ? color : faceColor;
-            ctx.fill();
+            ctx.strokeStyle = edgeColor;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
 
-            if (idx <= 3) {
-                ctx.strokeStyle = edgeColor;
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                ctx.save();
-                ctx.clip(); 
-                const cxF = (p0.x + p1.x + p2.x + p3.x) / 4;
-                const cyF = (p0.y + p1.y + p2.y + p3.y) / 4;
-                const d01 = Math.hypot(p1.x - p0.x, p1.y - p0.y);
-                const d12 = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                let ang = d01 > d12 ? Math.atan2(p1.y - p0.y, p1.x - p0.x) : Math.atan2(p2.y - p1.y, p2.x - p1.x);
-                if (Math.abs(ang) > Math.PI / 2) ang += Math.PI;
-                ctx.translate(cxF, cyF);
-                ctx.rotate(ang);
-                const sAvg = (p0.scale + p2.scale) / 2;
-                const fSize = Math.max(9, (barThickness - 4) * sAvg);
-                ctx.fillStyle = color;
-                ctx.font = `${fSize}px monospace`;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                const nChars = Math.max(3, Math.floor((d01 > d12 ? d01 : d12) / (fSize * 0.6)));
-                ctx.fillText(getBinaryString(nChars), 0, fSize * 0.1);
-                ctx.restore();
-            }
+            // Renderização do código binário
+            ctx.save();
+            ctx.clip(); 
+            const cxF = (p0.x + p1.x + p2.x + p3.x) / 4;
+            const cyF = (p0.y + p1.y + p2.y + p3.y) / 4;
+            const d01 = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+            const d12 = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            
+            let ang = d01 > d12 ? Math.atan2(p1.y - p0.y, p1.x - p0.x) : Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            if (Math.abs(ang) > Math.PI / 2) ang += Math.PI;
+            
+            ctx.translate(cxF, cyF);
+            ctx.rotate(ang);
+            
+            const sAvg = (p0.scale + p2.scale) / 2;
+            const fSize = Math.max(9, (barThickness - 4) * sAvg);
+            
+            // Agora o texto binário usa a cor clara para brilhar no fundo escuro em todas as faces
+            ctx.fillStyle = color;
+            ctx.font = `${fSize}px monospace`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            
+            const maxDim = Math.max(d01, d12);
+            const nChars = Math.max(1, Math.floor(maxDim / (fSize * 0.6)));
+            ctx.fillText(getBinaryString(nChars), 0, fSize * 0.1);
+            ctx.restore();
         });
     };
 
@@ -227,7 +187,6 @@ const BinaryCube = () => {
     };
   }, []);
 
-  // Handler para seguir o mouse
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -244,13 +203,12 @@ const BinaryCube = () => {
     >
         <canvas ref={canvasRef} className="block w-full h-full" />
         
-        {/* LENTE DE ESFUMAÇADO (SÓ APARECE NO HOVER) */}
         <motion.div 
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ 
                 opacity: isHovering ? 1 : 0, 
                 scale: isHovering ? 1 : 0.5,
-                x: mousePos.x - 150, // Centraliza a lente de 300px
+                x: mousePos.x - 150, 
                 y: mousePos.y - 150 
             }}
             transition={{ type: "spring", damping: 25, stiffness: 200, opacity: { duration: 0.2 } }}
@@ -380,7 +338,7 @@ export default function Home() {
         * { scrollbar-width: thin; scrollbar-color: ${isScrolling ? '#ffffff' : 'transparent'} transparent; transition: scrollbar-color 0.3s; }
       `}} />
 
-      {/* Navegação - LINHA EM BRANCO */}
+      {/* Navegação */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -389,7 +347,6 @@ export default function Home() {
       >
         <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            {/* ESCRITA OVERTHURE EM BRANCO */}
             <h1 className="text-2xl font-bold text-white">Overthure</h1>
           </div>
           
@@ -436,7 +393,6 @@ export default function Home() {
                       >
                         {char}
                       </motion.span>
-                      {/* HOVER EM DOURADO */}
                       <motion.span
                         variants={{
                           initial: { y: "100%" },
@@ -454,7 +410,6 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
-                {/* LINHA EM DOURADO NO HOVER */}
                 <motion.span 
                   variants={{
                     initial: { scaleX: 0 },
@@ -467,7 +422,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* BOTÃO EM BRANCO */}
           <Button 
             onClick={() => setLocation("/contato-form")}
             variant="default" 
@@ -510,12 +464,10 @@ export default function Home() {
               variants={staggerContainer}
               className="space-y-8 text-center max-w-4xl mx-auto"
             >
-              {/* BADGE "INOVAÇÃO" EM CINZA ESCURO MODERNO */}
               <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-[#1a1a1a] border border-white/10 rounded-full mb-4">
                 <span className="text-white/80 text-sm font-medium">Inovação que Transforma o Futuro</span>
               </motion.div>
               
-              {/* TÍTULO COM "AMANHÃ" EM CINZA */}
               <motion.h1 variants={fadeInUp} className="text-4xl md:text-7xl font-bold leading-tight">
                 Desenvolvendo o <span className="text-zinc-500">Amanhã</span> com Tecnologia de Ponta
               </motion.h1>
@@ -525,7 +477,6 @@ export default function Home() {
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                {/* BOTÃO EM BRANCO */}
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
                   size="lg" 
@@ -534,7 +485,6 @@ export default function Home() {
                   Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
 
-                {/* BOTÃO SEJA INVESTIDOR EM CINZA ESCURO MODERNO */}
                 <Button 
                   onClick={() => setLocation("/investidor")} 
                   size="lg" 
@@ -579,7 +529,6 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                {/* BLOCO CINZA QUE MUDA PARA DOURADO NO HOVER */}
                 <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group h-full">
                   <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors">
                     <box.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
@@ -682,7 +631,6 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                {/* BLOCO CINZA QUE MUDA PARA DOURADO NO HOVER */}
                 <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group h-full">
                   <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors">
                     <area.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
@@ -724,7 +672,6 @@ export default function Home() {
                 whileHover={{ y: -5 }}
                 className={`flex ${index === 6 || index === 7 ? 'lg:translate-x-[50%]' : ''}`}
               >
-                {/* BLOCO CINZA QUE MUDA PARA DOURADO NO HOVER */}
                 <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group w-full flex flex-col">
                   <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors shrink-0">
                     <service.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
@@ -738,7 +685,6 @@ export default function Home() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-16 text-center space-y-6">
             <p className="text-muted-foreground text-lg md:text-xl font-medium">Não encontrou o que procura? Entre em contato.</p>
-            {/* BOTÃO EM BRANCO */}
             <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-white text-black hover:bg-white/90 border-0 transition-all group px-8 font-bold">
               Solicitar Orçamento <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -782,11 +728,9 @@ export default function Home() {
         <div className="container relative z-10 text-center space-y-8">
           <h2 className="text-4xl md:text-5xl font-bold text-white">Pronto para Fazer Parte da Revolução?</h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {/* BOTÃO EM BRANCO */}
             <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-white text-black hover:bg-white/90 border-0 transition-all group font-bold">
               Agendar Reunião <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            {/* BOTÃO SEJA INVESTIDOR EM CINZA ESCURO MODERNO */}
             <Button size="lg" className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-[#262626] transition-colors font-medium">Baixar Pitch Deck</Button>
           </div>
         </div>
