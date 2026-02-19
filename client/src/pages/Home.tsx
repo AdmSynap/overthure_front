@@ -8,6 +8,10 @@ import { useLocation } from "wouter";
 // --- INÍCIO DO COMPONENTE CUBO BINÁRIO (6 FACES, CINZA, TAMANHO 260) ---
 const BinaryCube = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Estados para o efeito de fumaça sob o cursor
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -223,9 +227,42 @@ const BinaryCube = () => {
     };
   }, []);
 
+  // Handler para seguir o mouse
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div 
+        ref={containerRef}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        onMouseMove={handleMouseMove}
+        className="w-full h-full flex items-center justify-center relative overflow-hidden"
+    >
         <canvas ref={canvasRef} className="block w-full h-full" />
+        
+        {/* LENTE DE ESFUMAÇADO (SÓ APARECE NO HOVER) */}
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ 
+                opacity: isHovering ? 1 : 0, 
+                scale: isHovering ? 1 : 0.5,
+                x: mousePos.x - 150, // Centraliza a lente de 300px
+                y: mousePos.y - 150 
+            }}
+            transition={{ type: "spring", damping: 25, stiffness: 200, opacity: { duration: 0.2 } }}
+            className="absolute top-0 left-0 w-[300px] h-[300px] rounded-full pointer-events-none z-10"
+            style={{
+                background: "rgba(255, 255, 255, 0.03)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                maskImage: "radial-gradient(circle, black 20%, transparent 70%)",
+                WebkitMaskImage: "radial-gradient(circle, black 20%, transparent 70%)"
+            }}
+        />
     </div>
   );
 };
@@ -334,26 +371,26 @@ export default function Home() {
       <style dangerouslySetInnerHTML={{ __html: `
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
-        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
         .lenis.lenis-stopped { overflow: hidden; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2dd4bf; border-radius: 10px; transition: opacity 0.3s; }
+        ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 10px; transition: opacity 0.3s; }
         .idle::-webkit-scrollbar-thumb { background: transparent; }
-        * { scrollbar-width: thin; scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent; transition: scrollbar-color 0.3s; }
+        * { scrollbar-width: thin; scrollbar-color: ${isScrolling ? '#ffffff' : 'transparent'} transparent; transition: scrollbar-color 0.3s; }
       `}} />
 
-     {/* Navegação */}
+      {/* Navegação - LINHA EM BRANCO */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-teal-500/30"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/20"
       >
         <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-teal-500">Overthure Tech</h1>
+            {/* ESCRITA OVERTHURE EM BRANCO */}
+            <h1 className="text-2xl font-bold text-white">Overthure</h1>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
@@ -399,6 +436,7 @@ export default function Home() {
                       >
                         {char}
                       </motion.span>
+                      {/* HOVER EM DOURADO */}
                       <motion.span
                         variants={{
                           initial: { y: "100%" },
@@ -409,29 +447,31 @@ export default function Home() {
                           delay: index * 0.02,
                           ease: [0.215, 0.61, 0.355, 1]
                         }}
-                        className="absolute left-0 top-0 text-teal-400"
+                        className="absolute left-0 top-0 text-amber-500"
                       >
                         {char}
                       </motion.span>
                     </span>
                   ))}
                 </div>
+                {/* LINHA EM DOURADO NO HOVER */}
                 <motion.span 
                   variants={{
                     initial: { scaleX: 0 },
                     hover: { scaleX: 1 }
                   }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="absolute bottom-0 left-0 w-full h-[2px] bg-teal-400 origin-left"
+                  className="absolute bottom-0 left-0 w-full h-[2px] bg-amber-500 origin-left"
                 />
               </motion.button>
             ))}
           </div>
 
+          {/* BOTÃO EM BRANCO */}
           <Button 
             onClick={() => setLocation("/contato-form")}
             variant="default" 
-            className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity"
+            className="bg-white text-black hover:bg-white/90 border-0 transition-all font-bold"
           >
             Fale Conosco
           </Button>
@@ -442,8 +482,8 @@ export default function Home() {
       <section ref={heroRef} className="relative min-h-[110vh] flex items-center justify-center z-10 pt-20 overflow-hidden">
         
         {/* CUBO EM POSIÇÃO ABSOLUTA NO CANTO DIREITO INFERIOR */}
-        <div className="absolute bottom-0 right-[-180px] lg:bottom-10 lg:right-[-120px] w-[500px] h-[500px] lg:w-[850px] lg:h-[850px] pointer-events-none z-0 opacity-40 lg:opacity-70">
-           <BinaryCube />
+        <div className="absolute bottom-0 right-[-180px] lg:bottom-10 lg:right-[-120px] w-[500px] h-[500px] lg:w-[850px] lg:h-[850px] z-0 opacity-40 lg:opacity-70">
+            <BinaryCube />
         </div>
 
         <motion.div 
@@ -470,12 +510,14 @@ export default function Home() {
               variants={staggerContainer}
               className="space-y-8 text-center max-w-4xl mx-auto"
             >
-              <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-teal-500/10 border border-teal-500/20 rounded-full mb-4">
-                <span className="text-teal-500 text-sm font-medium">Inovação que Transforma o Futuro</span>
+              {/* BADGE "INOVAÇÃO" EM CINZA ESCURO MODERNO */}
+              <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-[#1a1a1a] border border-white/10 rounded-full mb-4">
+                <span className="text-white/80 text-sm font-medium">Inovação que Transforma o Futuro</span>
               </motion.div>
               
+              {/* TÍTULO COM "AMANHÃ" EM CINZA */}
               <motion.h1 variants={fadeInUp} className="text-4xl md:text-7xl font-bold leading-tight">
-                Desenvolvendo o <span className="bg-gradient-to-r from-teal-400 via-teal-500 to-teal-700 bg-clip-text text-transparent">Amanhã</span> com Tecnologia de Ponta
+                Desenvolvendo o <span className="text-zinc-500">Amanhã</span> com Tecnologia de Ponta
               </motion.h1>
               
               <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
@@ -483,18 +525,20 @@ export default function Home() {
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                {/* BOTÃO EM BRANCO */}
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
                   size="lg" 
-                  className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group w-full sm:w-auto"
+                  className="bg-white text-black hover:bg-white/90 border-0 transition-all group w-full sm:w-auto font-bold"
                 >
                   Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
 
+                {/* BOTÃO SEJA INVESTIDOR EM CINZA ESCURO MODERNO */}
                 <Button 
                   onClick={() => setLocation("/investidor")} 
                   size="lg" 
-                  className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors w-full sm:w-auto"
+                  className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-[#262626] transition-colors w-full sm:w-auto font-medium"
                 >
                   Seja um Investidor
                 </Button>
@@ -518,9 +562,6 @@ export default function Home() {
             <p className="text-lg text-muted-foreground leading-relaxed">
               A Overthure Tech nasceu da visão de transformar ideias ousadas em realidade tecnológica. O trabalho desenvolvido caracteriza-se por uma visão multidisciplinar, integrando pesquisa e engenharia para criar soluções à prova de futuro.
             </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Nossa base metodológica já se encontra validada e pronta para gerar soluções de excelência global.
-            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -538,9 +579,10 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <Card className="p-8 bg-card border-teal-500/30 hover:border-orange-600/50 transition-all duration-300 group h-full">
-                  <div className="w-16 h-16 bg-teal-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-orange-600/20 transition-colors">
-                    <box.icon className="h-8 w-8 text-teal-500 group-hover:text-orange-600 transition-colors" />
+                {/* BLOCO CINZA QUE MUDA PARA DOURADO NO HOVER */}
+                <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group h-full">
+                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors">
+                    <box.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">{box.title}</h3>
                   <p className="text-muted-foreground">{box.description}</p>
@@ -556,10 +598,10 @@ export default function Home() {
         <div className="container relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="space-y-8 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm">
                 <span className="flex items-center gap-1"><Sparkles className="w-4 h-4" /> Projetos Realizados</span>
               </div>
-              <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-teal-400">Portfólio</span></h2>
+              <h2 className="text-5xl md:text-6xl font-bold text-white">Conheça Nosso <br /> <span className="text-zinc-600">Portfólio</span></h2>
               <p className="text-lg text-gray-400 max-w-xl leading-relaxed">Explore uma seleção dos nossos melhores projetos.</p>
             </motion.div>
 
@@ -569,16 +611,16 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }} 
                 whileInView={{ opacity: 1, y: 0 }} 
                 whileHover={{ y: -10 }}
-                className="aspect-square rounded-[40px] border border-teal-500/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+                className="aspect-square rounded-[40px] border border-white/5 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer hover:border-amber-500/30"
               >
                 <div className="flex justify-end">
-                  <Code2 className="text-teal-500/40 w-10 h-10 group-hover:text-teal-400 transition-colors" />
+                  <Code2 className="text-zinc-700 w-10 h-10 group-hover:text-amber-500 transition-colors" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
                   <div className="flex items-center justify-between">
-                    <p className="text-teal-500 font-medium text-sm">Brand Design & Website</p>
-                    <div className="bg-teal-500/10 p-2.5 rounded-full border border-teal-500/20 group-hover:bg-teal-500 transition-all">
+                    <p className="text-zinc-500 font-medium text-sm group-hover:text-amber-500/70">Brand Design & Website</p>
+                    <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-amber-500 group-hover:text-black transition-all">
                       <ArrowRight className="w-5 h-5 -rotate-45" />
                     </div>
                   </div>
@@ -590,16 +632,16 @@ export default function Home() {
                 initial={{ opacity: 0, y: 40 }} 
                 whileInView={{ opacity: 1, y: 20 }} 
                 whileHover={{ y: 10 }}
-                className="aspect-square rounded-[40px] border border-orange-600/10 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer"
+                className="aspect-square rounded-[40px] border border-white/5 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer hover:border-amber-500/30"
               >
                 <div className="flex justify-end">
-                  <Sparkles className="text-orange-600/40 w-10 h-10 group-hover:text-orange-500 transition-colors" />
+                  <Sparkles className="text-zinc-700 w-10 h-10 group-hover:text-amber-500 transition-colors" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
                   <div className="flex items-center justify-between">
-                    <p className="text-orange-600 font-medium text-sm">Software Financeiro</p>
-                    <div className="bg-orange-600/10 p-2.5 rounded-full border border-orange-600/20 group-hover:bg-orange-600 transition-all">
+                    <p className="text-zinc-500 font-medium text-sm group-hover:text-amber-500/70">Software Financeiro</p>
+                    <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-amber-500 group-hover:text-black transition-all">
                       <ArrowRight className="w-5 h-5 -rotate-45" />
                     </div>
                   </div>
@@ -640,9 +682,10 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <Card className="p-8 bg-card border-teal-500/30 hover:border-orange-600/50 transition-all duration-300 group h-full">
-                  <div className="w-16 h-16 bg-teal-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-orange-600/20 transition-colors">
-                    <area.icon className="h-8 w-8 text-teal-500 group-hover:text-orange-600 transition-colors" />
+                {/* BLOCO CINZA QUE MUDA PARA DOURADO NO HOVER */}
+                <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group h-full">
+                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors">
+                    <area.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">{area.title}</h3>
                   <p className="text-muted-foreground">{area.description}</p>
@@ -681,9 +724,10 @@ export default function Home() {
                 whileHover={{ y: -5 }}
                 className={`flex ${index === 6 || index === 7 ? 'lg:translate-x-[50%]' : ''}`}
               >
-                <Card className="p-8 bg-card border-teal-500/30 hover:border-orange-600/50 transition-all duration-300 group w-full flex flex-col">
-                  <div className="w-16 h-16 bg-teal-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-orange-600/20 transition-colors shrink-0">
-                    <service.icon className="h-8 w-8 text-teal-500 group-hover:text-orange-600 transition-colors" />
+                {/* BLOCO CINZA QUE MUDA PARA DOURADO NO HOVER */}
+                <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group w-full flex flex-col">
+                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors shrink-0">
+                    <service.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
                   <p className="text-muted-foreground flex-grow">{service.description}</p>
@@ -694,7 +738,8 @@ export default function Home() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-16 text-center space-y-6">
             <p className="text-muted-foreground text-lg md:text-xl font-medium">Não encontrou o que procura? Entre em contato.</p>
-            <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-all group px-8">
+            {/* BOTÃO EM BRANCO */}
+            <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-white text-black hover:bg-white/90 border-0 transition-all group px-8 font-bold">
               Solicitar Orçamento <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
@@ -715,12 +760,12 @@ export default function Home() {
               { number: "03", title: "Escalabilidade", description: "Soluções projetadas para crescimento exponencial." },
               { number: "04", title: "Sustentabilidade", description: "Integramos princípios ESG em todos os projetos." }
             ].map((item, index) => (
-              <motion.div key={index} initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: index * 0.1 }} className="flex gap-4 group">
-                <div className="flex-shrink-0 w-12 h-12 bg-teal-500/10 rounded-lg flex items-center justify-center group-hover:bg-orange-600/20 transition-colors">
-                  <span className="text-teal-500 font-bold text-xl group-hover:text-orange-600 transition-colors">{item.number}</span>
+              <motion.div key={index} initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: index * 0.1 }} className="flex gap-4 group cursor-default">
+                <div className="flex-shrink-0 w-12 h-12 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center group-hover:border-amber-500/50 group-hover:bg-amber-500/10 transition-colors">
+                  <span className="text-zinc-500 font-bold text-xl group-hover:text-amber-500 transition-colors">{item.number}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-amber-500 transition-colors">{item.title}</h3>
                   <p className="text-muted-foreground">{item.description}</p>
                 </div>
               </motion.div>
@@ -732,19 +777,18 @@ export default function Home() {
       {/* Revolução */}
       <section className="py-24 relative overflow-hidden z-20 bg-background">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/15 via-transparent to-orange-600/15"></div>
+          <div className="absolute inset-0 bg-white/[0.02]"></div>
         </div>
-        <div className="container relative z-10">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="max-w-3xl mx-auto text-center space-y-8">
-            <h2 className="text-4xl md:text-5xl font-bold">Pronto para Fazer Parte da Revolução?</h2>
-            <p className="text-xl text-muted-foreground">Entre em contato conosco para conhecer nossas oportunidades.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90 border-0 transition-opacity group">
-                Agendar Reunião <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button size="lg" className="bg-transparent border border-orange-600 text-orange-600 hover:bg-orange-100 hover:text-orange-700 transition-colors">Baixar Pitch Deck</Button>
-            </div>
-          </motion.div>
+        <div className="container relative z-10 text-center space-y-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-white">Pronto para Fazer Parte da Revolução?</h2>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* BOTÃO EM BRANCO */}
+            <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-white text-black hover:bg-white/90 border-0 transition-all group font-bold">
+              Agendar Reunião <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            {/* BOTÃO SEJA INVESTIDOR EM CINZA ESCURO MODERNO */}
+            <Button size="lg" className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-[#262626] transition-colors font-medium">Baixar Pitch Deck</Button>
+          </div>
         </div>
       </section>
 
@@ -754,12 +798,12 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto text-center space-y-8">
             <h2 className="text-4xl md:text-5xl font-bold">Entre em Contato</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
-              <a href="mailto:contato@overthuretech.com" className="flex items-center gap-2 text-white hover:text-teal-500 transition-colors">
+              <a href="mailto:contato@overthuretech.com" className="flex items-center gap-2 text-white hover:text-amber-500 transition-colors">
                 <Mail className="h-5 w-5 text-white" /> <span>contato@overthuretech.com</span>
               </a>
               <div className="flex items-center gap-4">
-                <Instagram className="h-6 w-6 text-white cursor-pointer hover:text-teal-500 transition-colors" />
-                <WhatsappIcon className="h-6 w-6 text-white cursor-pointer hover:text-teal-500 transition-colors" />
+                <Instagram className="h-6 w-6 text-white cursor-pointer hover:text-amber-500 transition-colors" />
+                <WhatsappIcon className="h-6 w-6 text-white cursor-pointer hover:text-amber-500 transition-colors" />
               </div>
             </div>
           </motion.div>
@@ -767,13 +811,13 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-teal-500/30 relative z-10 bg-background/80 backdrop-blur-sm">
+      <footer className="py-12 border-t border-white/10 relative z-10 bg-background/80 backdrop-blur-sm">
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <span className="text-sm text-muted-foreground">© 2026 Overthure Tech. Todos os direitos reservados.</span>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-teal-500 transition-colors">Privacidade</a>
-              <a href="#" className="hover:text-teal-500 transition-colors">Termos de Uso</a>
+              <a href="#" className="hover:text-amber-500 transition-colors">Privacidade</a>
+              <a href="#" className="hover:text-amber-500 transition-colors">Termos de Uso</a>
             </div>
           </div>
         </div>
