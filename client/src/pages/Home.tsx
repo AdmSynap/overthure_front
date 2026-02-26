@@ -2,90 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Code2, Sparkles } from "lucide-react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useMotionValueEvent } from "framer-motion";
 import { useLocation } from "wouter";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
-// --- INÍCIO DO COMPONENTE ROBÔ BINÁRIO ---
-const BinaryRobot = () => {
-  const [robotText, setRobotText] = useState("");
-  
-  // Matriz redesenhada para formar o robô exato da imagem
-  const robotShape = [
-    "                      0                      ",
-    "                     000                     ",
-    "                    00000                    ",
-    "                   0000000                   ",
-    "                    00000                    ",
-    "                     000                     ",
-    "                      0                      ",
-    "                      0                      ",
-    "             0000000000000000000             ",
-    "          0000000000000000000000000          ",
-    "        00000000000000000000000000000        ",
-    "      000000000000000000000000000000000      ",
-    "     00000000000000000000000000000000000     ",
-    "    00000   0000000000   0000000000   00000  ",
-    "   00000  0000000000000 0000000000000  00000 ",
-    "  00000  00000      0000000      00000  00000",
-    "  00000  0000  0000  00000  0000  0000  00000",
-    "  00000  0000  0000  00000  0000  0000  00000",
-    "  00000  0000        00000        0000  00000",
-    "  00000   00000    000000000    00000   00000",
-    "   00000    0000000000   0000000000    00000 ",
-    "   0000000                  0        0000000 ",
-    "    00000000000000000000000000000000000000   ",
-    "      000000000000000000000000000000000    0 ",
-    "        00000000000000000000000000000    000 ",
-    "           00000000000000000000000     00000 ",
-    "               000000000000000       000000  ",
-    "            000000000000000000000   000000   ",
-    "         0000000000000000000000000 000000    ",
-    "       0000  00000000000000000000000000      ",
-    "      00000  000000000000000000000000        ",
-    "     00000   000000000000000000000           ",
-    "     0000    000000000000000000000           ",
-    "      000     0000000000000000000            ",
-    "               00000000000000000             ",
-    "                 0000000000000               ",
-    "                  0000   0000                ",
-    "                 0000     0000               ",
-    "                0000       0000              ",
-    "               0000         0000             "
-  ];
-
-  useEffect(() => {
-    // Transforma os "0"s em números binários aleatórios (0 ou 1) em tempo real, mantendo espaços vazios
-    const interval = setInterval(() => {
-      const newText = robotShape.map(line => {
-        return line.split('').map(char => {
-          if (char === ' ') return ' ';
-          return Math.random() > 0.5 ? '1' : '0';
-        }).join('');
-      }).join('\n');
-      setRobotText(newText);
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <motion.div
-      animate={{ y: [0, -10, 0] }} // Animação flutuante sutil
-      transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-      className="font-mono text-white whitespace-pre font-bold text-[6px] sm:text-[8px] md:text-[10px] lg:text-[12px] leading-[1.1]"
-      style={{ 
-        // Sombra alterada para dar um efeito holográfico com tom leve de azulciano, como na imagem
-        textShadow: "0 0 5px rgba(255, 255, 255, 0.8), 0 0 15px rgba(200, 230, 255, 0.6), 0 0 25px rgba(100, 200, 255, 0.4)",
-        letterSpacing: "0.15em"
-      }}
-    >
-      {robotText || robotShape.join('\n')}
-    </motion.div>
-  );
-};
-// --- FIM DO COMPONENTE ROBÔ BINÁRIO ---
-
-// --- INÍCIO DO COMPONENTE CUBO BINÁRIO ---
+// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (Hero) ---
 const BinaryCube = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -351,6 +272,8 @@ export default function Home() {
 
   // --- LÓGICA DE ANIMAÇÃO DA SEÇÃO DE SERVIÇOS ---
   const servicosRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null); // Ref do vídeo
+
   const { scrollYProgress: servicosProgress } = useScroll({
     target: servicosRef,
     offset: ["start start", "end end"]
@@ -360,6 +283,14 @@ export default function Home() {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001
+  });
+
+  // --- SINCRONIZANDO O VÍDEO COM O SCROLL ---
+  useMotionValueEvent(smoothServicosProgress, "change", (latest) => {
+    if (videoRef.current && videoRef.current.duration) {
+      // Avança ou recua o tempo do vídeo (currentTime) multiplicando a porcentagem de descida (latest) pelo tempo total do vídeo
+      videoRef.current.currentTime = latest * videoRef.current.duration;
+    }
   });
 
   useEffect(() => {
@@ -522,12 +453,16 @@ export default function Home() {
             ))}
           </div>
 
+          {/* BOTÃO BRANCO 1: FALE CONOSCO */}
           <Button 
             onClick={() => setLocation("/contato-form")}
             variant="default" 
-            className="bg-white text-black hover:bg-white/90 border-0 transition-all font-bold"
+            className="relative overflow-hidden bg-white text-black border-0 group font-bold"
           >
-            Fale Conosco
+            <span className="absolute inset-0 w-full h-full bg-amber-500 origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
+            <span className="relative z-10 flex items-center justify-center">
+              Fale Conosco
+            </span>
           </Button>
         </div>
       </motion.nav>
@@ -576,12 +511,17 @@ export default function Home() {
               </motion.p>
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 pt-4">
+                
+                {/* BOTÃO BRANCO 2: CONHEÇA NOSSOS PROJETOS */}
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
                   size="lg" 
-                  className="bg-white text-black hover:bg-white/90 border-0 transition-all group w-full sm:w-auto font-bold"
+                  className="relative overflow-hidden bg-white text-black border-0 group w-full sm:w-auto font-bold"
                 >
-                  Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="absolute inset-0 w-full h-full bg-amber-500 origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
+                  <span className="relative z-10 flex items-center justify-center">
+                    Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
 
                 <Button 
@@ -743,31 +683,51 @@ export default function Home() {
         </div>
       </section>
       
-      {/* SEÇÃO NOSSOS SERVIÇOS (REFEITA COM O ROBÔ E LISTA DINÂMICA) */}
+      {/* SEÇÃO NOSSOS SERVIÇOS (REFEITA COM O VÍDEO DO ROBÔ SCRUBBING) */}
       <section id="servicos" ref={servicosRef} className="h-[250vh] relative bg-black z-10">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
           <div className="container h-full flex items-center">
             
-            {/* Lado Esquerdo - Fixo e Substituído pelo Robô Binário (Visível em Desktop) */}
+            {/* Lado Esquerdo - O VÍDEO DO ROBÔ (Visível em Desktop) */}
             <div className="hidden lg:flex w-2/5 h-full flex-col justify-center items-center pr-10">
               <motion.div 
                 initial={{ opacity: 0, scale: 0.8 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
                 viewport={{ once: false }} 
                 transition={{ duration: 0.6 }}
-                className="flex items-center justify-center w-full"
+                className="flex items-center justify-center w-full relative"
               >
-                <BinaryRobot />
+                <video 
+                  ref={videoRef}
+                  src="/robo-video.mp4" 
+                  muted 
+                  playsInline
+                  preload="auto"
+                  className="w-full max-w-[450px] object-contain transition-all"
+                  style={{
+                    // Faz o fundo preto do vídeo sumir e cria uma sombra de holograma azul clarinho
+                    mixBlendMode: "screen", 
+                    filter: "drop-shadow(0px 0px 15px rgba(100, 200, 255, 0.4))"
+                  }}
+                />
               </motion.div>
             </div>
             
             {/* Lado Direito - Lista Dinâmica de Títulos (Scroll Reveal) */}
             <div className="w-full lg:w-3/5 flex flex-col justify-center pl-0 lg:pl-16">
               
-              {/* O Robô substituindo o Título Visível Apenas no Mobile */}
+              {/* Vídeo Visível Apenas no Mobile (Em mobile ele vai dar autoplay em loop porque a tela rola rápido) */}
               <div className="lg:hidden mb-12 flex flex-col items-center">
-                <BinaryRobot />
-                <p className="text-sm text-zinc-500 mt-8 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
+                <video 
+                  src="/robo-video.mp4" 
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-48 object-contain mb-4"
+                  style={{ mixBlendMode: "screen", filter: "drop-shadow(0px 0px 10px rgba(100, 200, 255, 0.4))" }}
+                />
+                <p className="text-sm text-zinc-500 mt-2 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
               </div>
 
               {/* LISTA DE TÍTULOS - ESPAÇAMENTOS REDUZIDOS E SEM CORTAR */}
@@ -838,9 +798,19 @@ export default function Home() {
         <div className="container relative z-10 text-center space-y-8">
           <h2 className="text-4xl md:text-5xl font-bold text-white">Pronto para Fazer Parte da Revolução?</h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-white text-black hover:bg-white/90 border-0 transition-all group font-bold">
-              Agendar Reunião <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            
+            {/* BOTÃO BRANCO 3: AGENDAR REUNIÃO */}
+            <Button 
+              onClick={() => setLocation("/contato-form")} 
+              size="lg" 
+              className="relative overflow-hidden bg-white text-black border-0 group font-bold"
+            >
+              <span className="absolute inset-0 w-full h-full bg-amber-500 origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
+              <span className="relative z-10 flex items-center justify-center">
+                Agendar Reunião <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </span>
             </Button>
+
             <Button size="lg" className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-[#262626] transition-colors font-medium">Baixar Pitch Deck</Button>
           </div>
         </div>
