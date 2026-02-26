@@ -115,8 +115,8 @@ export default function ContatoForm() {
   const chipStyle = (isSelected: boolean) => `
     px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-md border transition-all duration-300
     ${isSelected 
-      ? "bg-gradient-to-r from-teal-500 to-orange-600 border-transparent text-black shadow-lg shadow-teal-500/20" 
-      : "bg-white/5 border-white/10 text-muted-foreground hover:border-teal-500/50 hover:text-white"
+      ? "bg-white border-transparent text-black shadow-lg shadow-white/20" 
+      : "bg-white/5 border-white/10 text-muted-foreground hover:border-white/50 hover:text-white"
     }
   `;
 
@@ -127,13 +127,13 @@ export default function ContatoForm() {
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
-          background: ${isScrolling ? '#2dd4bf' : 'transparent'}; 
+          background: ${isScrolling ? '#ffffff' : 'transparent'}; 
           border-radius: 10px; 
           transition: background 0.3s; 
         }
         html {
           scrollbar-width: thin;
-          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
+          scrollbar-color: ${isScrolling ? '#ffffff' : 'transparent'} transparent;
           transition: scrollbar-color 0.3s;
         }
       `}} />
@@ -147,7 +147,7 @@ export default function ContatoForm() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-muted-foreground hover:text-teal-500 transition-colors mb-12"
+          className="flex items-center gap-2 text-muted-foreground hover:text-white transition-colors mb-12"
         >
           <ArrowLeft className="w-4 h-4" /> Voltar para Home
         </motion.button>
@@ -157,9 +157,11 @@ export default function ContatoForm() {
           {/* Coluna Esquerda */}
           <div className="space-y-12">
             <motion.div variants={fadeInUp} initial="initial" animate="animate">
-              <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Contato</span>
+              {/* PALAVRA "CONTATO" EM CINZA AQUI */}
+              <span className="text-gray-400 font-medium tracking-wider text-sm uppercase">Contato</span>
               <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
-                Vamos Construir Algo <span className="text-teal-500">Incrível</span> Juntos?
+                {/* PALAVRA "INCRÍVEL" EM CINZA AQUI */}
+                Vamos Construir Algo <span className="text-gray-400">Incrível</span> Juntos?
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Conte-nos sobre o seu projeto. Nossa equipe de especialistas analisará seu briefing e retornará com uma proposta estratégica.
@@ -178,9 +180,9 @@ export default function ContatoForm() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 + 0.3 }}
                 >
-                  <Card className="bg-card/50 border-teal-500/20 hover:border-teal-500/50 transition-colors">
+                  <Card className="bg-card/50 border-white/20 hover:border-white/50 transition-colors">
                     <CardContent className="p-6 flex items-start gap-4">
-                      <div className="bg-teal-500/10 p-3 rounded-lg text-teal-500">
+                      <div className="bg-white/10 p-3 rounded-lg text-white">
                         <item.icon className="w-6 h-6" />
                       </div>
                       <div>
@@ -195,12 +197,11 @@ export default function ContatoForm() {
 
             <div className="pt-8 border-t border-white/10 space-y-4">
               <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
-                <Mail className="w-5 h-5 text-teal-500" />
-                {/* E-MAIL CORRIGIDO AQUI */}
+                <Mail className="w-5 h-5 text-white" />
                 <span>contato@overthure.com</span>
               </div>
               <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
-                <MapPin className="w-5 h-5 text-teal-500" />
+                <MapPin className="w-5 h-5 text-white" />
                 <span>Curitiba, PR - Brasil (Atendimento Global)</span>
               </div>
             </div>
@@ -213,8 +214,8 @@ export default function ContatoForm() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="sticky top-8"
           >
-            <Card className="bg-[#0a0a0a] border-teal-500/20 shadow-2xl shadow-teal-900/10 overflow-hidden">
-              <div className="h-2 w-full bg-gradient-to-r from-teal-500 to-orange-600" />
+            <Card className="bg-[#0a0a0a] border-white/20 shadow-2xl shadow-white/5 overflow-hidden">
+              <div className="h-2 w-full bg-white" />
               
               <CardContent className="p-8">
                 {!submitted ? (
@@ -229,11 +230,11 @@ export default function ContatoForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Nome Completo</Label>
-                        <Input name="firstName" required placeholder="Seu nome" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                        <Input name="firstName" required placeholder="Seu nome" className="bg-white/5 border-white/10 focus:border-white text-white" />
                       </div>
                       <div className="space-y-2">
                         <Label>E-mail</Label>
-                        <Input name="email" required type="email" placeholder="seu@email.com" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                        <Input name="email" required type="email" placeholder="seu@email.com" className="bg-white/5 border-white/10 focus:border-white text-white" />
                       </div>
                     </div>
 
@@ -250,7 +251,7 @@ export default function ContatoForm() {
 
                     <div className="space-y-2">
                       <Label>URL Atual (Opcional)</Label>
-                      <Input name="website" placeholder="https://www.seusite.com.br" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                      <Input name="website" placeholder="https://www.seusite.com.br" className="bg-white/5 border-white/10 focus:border-white text-white" />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -280,7 +281,7 @@ export default function ContatoForm() {
                     <AnimatePresence>
                       {hasDeadline === "sim" && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                          <Input name="deadlineDate" required placeholder="Qual a data limite desejada?" className="bg-white/5 border-white/10 focus:border-teal-500" />
+                          <Input name="deadlineDate" required placeholder="Qual a data limite desejada?" className="bg-white/5 border-white/10 focus:border-white text-white" />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -292,14 +293,14 @@ export default function ContatoForm() {
                         required 
                         rows={4} 
                         placeholder="Descreva os objetivos, público-alvo e funcionalidades principais..." 
-                        className="bg-white/5 border-white/10 focus:border-teal-500 resize-none" 
+                        className="bg-white/5 border-white/10 focus:border-white resize-none text-white" 
                       />
                     </div>
 
                     <Button 
                       type="submit" 
                       disabled={isSubmitting}
-                      className="w-full h-12 bg-gradient-to-r from-teal-500 to-orange-600 text-black font-bold uppercase tracking-wide hover:opacity-90 transition-all border-0"
+                      className="w-full h-12 bg-white text-black font-bold uppercase tracking-wide hover:bg-gray-200 transition-all border-0"
                     >
                       {isSubmitting ? "Enviando..." : (
                         <span className="flex items-center gap-2">
@@ -311,15 +312,15 @@ export default function ContatoForm() {
                 ) : (
                   <div className="text-center py-20 space-y-6">
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
-                      <CheckCircle2 className="h-24 w-24 text-teal-500 mx-auto" />
+                      <CheckCircle2 className="h-24 w-24 text-white mx-auto" />
                     </motion.div>
                     <h3 className="text-3xl font-bold text-white uppercase tracking-tighter">Briefing Recebido!</h3>
                     <p className="text-muted-foreground">Nossa equipe analisará sua solicitação e entrará em contato em breve.</p>
                     <div className="pt-8">
-                      <div className="w-48 h-1 bg-white/5 mx-auto rounded-full overflow-hidden">
-                          <motion.div initial={{ x: "-100%" }} animate={{ x: "0%" }} transition={{ duration: 5 }} className="h-full bg-teal-500 shadow-[0_0_10px_#2dd4bf]" />
+                      <div className="w-48 h-1 bg-white/10 mx-auto rounded-full overflow-hidden">
+                          <motion.div initial={{ x: "-100%" }} animate={{ x: "0%" }} transition={{ duration: 5 }} className="h-full bg-white shadow-[0_0_10px_#ffffff]" />
                       </div>
-                      <p className="text-[10px] mt-4 text-teal-500 uppercase tracking-[0.2em] font-black italic">Redirecionando...</p>
+                      <p className="text-[10px] mt-4 text-white uppercase tracking-[0.2em] font-black italic">Redirecionando...</p>
                     </div>
                   </div>
                 )}
