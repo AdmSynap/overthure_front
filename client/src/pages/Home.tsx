@@ -2,16 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Code2, Sparkles } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { useLocation } from "wouter";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
-// --- INÍCIO DO COMPONENTE CUBO BINÁRIO (ESTRUTURA VAZADA APENAS COM CÓDIGO) ---
+// --- INÍCIO DO COMPONENTE CUBO BINÁRIO ---
 const BinaryCube = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  
+  // Otimização de Performance: Usando valores de movimento em vez de estado React
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const smoothX = useSpring(mouseX, { damping: 25, stiffness: 200 });
+  const smoothY = useSpring(mouseY, { damping: 25, stiffness: 200 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -187,7 +192,9 @@ const BinaryCube = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    // Atualiza diretamente na placa de vídeo, sem re-renderizar o componente
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
   };
 
   return (
@@ -204,13 +211,15 @@ const BinaryCube = () => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ 
                 opacity: isHovering ? 1 : 0, 
-                scale: isHovering ? 1 : 0.5,
-                x: mousePos.x - 150, 
-                y: mousePos.y - 150 
+                scale: isHovering ? 1 : 0.5
             }}
-            transition={{ type: "spring", damping: 25, stiffness: 200, opacity: { duration: 0.2 } }}
-            className="absolute top-0 left-0 w-[300px] h-[300px] rounded-full pointer-events-none z-10"
+            transition={{ opacity: { duration: 0.2 }, scale: { duration: 0.2 } }}
+            className="absolute top-0 left-0 w-[300px] h-[300px] rounded-full pointer-events-none z-10 origin-center"
             style={{
+                x: smoothX,
+                y: smoothY,
+                translateX: "-50%",
+                translateY: "-50%",
                 background: "rgba(255, 255, 255, 0.03)",
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
@@ -241,7 +250,6 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const [isScrolling, setIsScrolling] = useState(false);
   const lenisRef = useRef<any>(null);
   
   const heroRef = useRef(null);
@@ -282,19 +290,6 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    const handleScroll = () => {
-      setIsScrolling(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        setIsScrolling(false);
-      }, 1000); 
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -321,13 +316,14 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen bg-background text-foreground relative ${isScrolling ? 'scrolling' : 'idle'}`}>
+    <div className="min-h-screen bg-background text-foreground relative">
       
       {/* SEU COMPONENTE DE PARTÍCULAS IMPORTADO AQUI */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
         <ParticlesBackground />
       </div>
 
+      {/* OTIMIZAÇÃO: Estilos CSS puros para a barra de rolagem usando as classes do Lenis */}
       <style dangerouslySetInnerHTML={{ __html: `
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -335,9 +331,12 @@ export default function Home() {
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 10px; transition: opacity 0.3s; }
-        .idle::-webkit-scrollbar-thumb { background: transparent; }
-        * { scrollbar-width: thin; scrollbar-color: ${isScrolling ? '#ffffff' : 'transparent'} transparent; transition: scrollbar-color 0.3s; }
+        ::-webkit-scrollbar-thumb { background: transparent; border-radius: 10px; transition: background 0.3s; }
+        
+        html.lenis-scrolling ::-webkit-scrollbar-thumb { background: #ffffff; }
+        
+        html { scrollbar-width: thin; scrollbar-color: transparent transparent; transition: scrollbar-color 0.3s; }
+        html.lenis-scrolling { scrollbar-color: #ffffff transparent; }
       `}} />
 
       {/* Navegação */}
@@ -464,7 +463,6 @@ export default function Home() {
               initial="initial"
               animate="animate"
               variants={staggerContainer}
-              // ALTERAÇÃO AQUI: text-center e mx-auto removidos, text-left adicionado, max-w ajustado
               className="space-y-8 text-left max-w-3xl"
             >
               <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-[#1a1a1a] border border-white/10 rounded-full mb-4">
@@ -479,7 +477,6 @@ export default function Home() {
                 Com foco e dedicação à pesquisa e desenvolvimento de soluções inovadoras que revolucionam indústrias e criam valor sustentável.
               </motion.p>
               
-              {/* ALTERAÇÃO AQUI: justify-center mudado para justify-start */}
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 pt-4">
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
