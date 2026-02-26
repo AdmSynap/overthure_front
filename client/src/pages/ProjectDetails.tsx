@@ -28,12 +28,12 @@ const projectsData: Record<string, Project> = {
     year: "2025",
     client: "Abela Mielo Cosmetics",
     services: ["Identidade Visual", "UX/UI Design", "Frontend Dev"],
-    color: "from-teal-500 to-emerald-700",
+    color: "from-white to-gray-500", // Cor neutra para o gradiente de texto
     url: "https://www.instagram.com/abelamielo",
     images: [
-      "bg-gradient-to-br from-teal-900/40 to-black",
-      "bg-gradient-to-tl from-emerald-900/40 to-black",
-      "bg-gradient-to-bl from-teal-800/20 to-black"
+      "bg-gradient-to-br from-gray-900/60 to-black",
+      "bg-gradient-to-tl from-gray-800/50 to-black",
+      "bg-gradient-to-bl from-zinc-900/40 to-black"
     ]
   },
   "core-engine": {
@@ -44,12 +44,12 @@ const projectsData: Record<string, Project> = {
     year: "2024",
     client: "FinTech Global Corp",
     services: ["Software Architecture", "React Development", "Real-time Data"],
-    color: "from-orange-600 to-red-800",
+    color: "from-gray-300 to-gray-600", // Cor neutra para o gradiente de texto
     url: "https://www.google.com",
     images: [
-      "bg-gradient-to-br from-orange-900/40 to-black",
-      "bg-gradient-to-tl from-red-900/40 to-black",
-      "bg-gradient-to-bl from-orange-800/20 to-black"
+      "bg-gradient-to-br from-zinc-900/60 to-black",
+      "bg-gradient-to-tl from-zinc-800/50 to-black",
+      "bg-gradient-to-bl from-gray-900/40 to-black"
     ]
   }
 };
@@ -127,19 +127,19 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className={`min-h-screen bg-background text-foreground selection:bg-teal-500/30 overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
+    <div className={`min-h-screen bg-background text-foreground selection:bg-white/30 overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
       
       <style dangerouslySetInnerHTML={{ __html: `
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
-          background: ${isScrolling ? '#2dd4bf' : 'transparent'}; 
+          background: ${isScrolling ? '#ffffff' : 'transparent'}; 
           border-radius: 10px; 
           transition: background 0.3s; 
         }
         html {
           scrollbar-width: thin;
-          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
+          scrollbar-color: ${isScrolling ? '#ffffff' : 'transparent'} transparent;
           transition: scrollbar-color 0.3s;
         }
       `}} />
@@ -205,15 +205,15 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
           className="grid grid-cols-1 md:grid-cols-4 gap-8 border-y border-white/10 py-12 mb-24"
         >
           <div className="space-y-2">
-            <span className="flex items-center gap-2 text-xs font-mono text-teal-500 uppercase"><User className="w-3 h-3" /> Cliente</span>
+            <span className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase"><User className="w-3 h-3" /> Cliente</span>
             <p className="text-lg font-medium">{project.client}</p>
           </div>
           <div className="space-y-2">
-            <span className="flex items-center gap-2 text-xs font-mono text-teal-500 uppercase"><Calendar className="w-3 h-3" /> Ano</span>
+            <span className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase"><Calendar className="w-3 h-3" /> Ano</span>
             <p className="text-lg font-medium">{project.year}</p>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <span className="flex items-center gap-2 text-xs font-mono text-teal-500 uppercase"><Layers className="w-3 h-3" /> Serviços</span>
+            <span className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase"><Layers className="w-3 h-3" /> Serviços</span>
             <div className="flex flex-wrap gap-2">
               {project.services.map((s, i) => (
                 <span key={i} className="px-3 py-1 bg-white/5 rounded-full text-xs border border-white/10">{s}</span>
@@ -225,7 +225,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
         {/* DESCRIÇÃO */}
         <div className="grid md:grid-cols-12 gap-12 mb-32">
           <div className="md:col-span-4">
-            <h3 className="text-2xl font-bold mb-4 border-l-4 border-teal-500 pl-4">O Desafio</h3>
+            <h3 className="text-2xl font-bold mb-4 border-l-4 border-white pl-4">O Desafio</h3>
           </div>
           <div className="md:col-span-8">
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
@@ -234,7 +234,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
             <div className="mt-8">
                 <Button 
                   onClick={() => window.open(project.url, '_blank')}
-                  className="bg-gradient-to-r from-teal-500 to-orange-600 text-black font-bold hover:opacity-90 border-0 transition-all px-8 h-12"
+                  className="bg-white text-black font-bold hover:bg-gray-200 border-0 transition-all px-8 h-12"
                 >
                     Visitar Website <ExternalLink className="ml-2 w-5 h-5" />
                 </Button>
@@ -256,7 +256,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
             <div className="text-sm text-muted-foreground">Próximo Projeto</div>
             <Button 
                 variant="link" 
-                className="text-2xl font-bold text-white hover:text-teal-500 transition-colors p-0 h-auto"
+                className="text-2xl font-bold text-white hover:text-gray-400 transition-colors p-0 h-auto"
                 onClick={() => setLocation(projectId === 'abela-mielo' ? '/project/core-engine' : '/project/abela-mielo')}
             >
                 {projectId === 'abela-mielo' ? 'Core Engine' : 'Abela Mielo'} <ArrowRight className="ml-4 w-6 h-6" />
