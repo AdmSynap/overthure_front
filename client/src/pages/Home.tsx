@@ -272,7 +272,7 @@ export default function Home() {
 
   // --- LÓGICA DE ANIMAÇÃO DA SEÇÃO DE SERVIÇOS ---
   const servicosRef = useRef(null);
-  const videoRef = useRef<HTMLVideoElement>(null); // Ref do vídeo
+  const videoRef = useRef<HTMLVideoElement>(null); 
 
   const { scrollYProgress: servicosProgress } = useScroll({
     target: servicosRef,
@@ -288,7 +288,6 @@ export default function Home() {
   // --- SINCRONIZANDO O VÍDEO COM O SCROLL ---
   useMotionValueEvent(smoothServicosProgress, "change", (latest) => {
     if (videoRef.current && videoRef.current.duration) {
-      // Avança ou recua o tempo do vídeo (currentTime) multiplicando a porcentagem de descida (latest) pelo tempo total do vídeo
       videoRef.current.currentTime = latest * videoRef.current.duration;
     }
   });
@@ -434,7 +433,7 @@ export default function Home() {
                           delay: index * 0.02,
                           ease: [0.215, 0.61, 0.355, 1]
                         }}
-                        className="absolute left-0 top-0 text-amber-500"
+                        className="absolute left-0 top-0 text-[#EDD187]"
                       >
                         {char}
                       </motion.span>
@@ -447,19 +446,18 @@ export default function Home() {
                     hover: { scaleX: 1 }
                   }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="absolute bottom-0 left-0 w-full h-[2px] bg-amber-500 origin-left"
+                  className="absolute bottom-0 left-0 w-full h-[2px] bg-[#EDD187] origin-left"
                 />
               </motion.button>
             ))}
           </div>
 
-          {/* BOTÃO BRANCO 1: FALE CONOSCO */}
           <Button 
             onClick={() => setLocation("/contato-form")}
             variant="default" 
             className="relative overflow-hidden bg-white text-black border-0 group font-bold"
           >
-            <span className="absolute inset-0 w-full h-full bg-amber-500 origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
+            <span className="absolute inset-0 w-full h-full bg-[#EDD187] origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
             <span className="relative z-10 flex items-center justify-center">
               Fale Conosco
             </span>
@@ -512,13 +510,12 @@ export default function Home() {
               
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 pt-4">
                 
-                {/* BOTÃO BRANCO 2: CONHEÇA NOSSOS PROJETOS */}
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
                   size="lg" 
                   className="relative overflow-hidden bg-white text-black border-0 group w-full sm:w-auto font-bold"
                 >
-                  <span className="absolute inset-0 w-full h-full bg-amber-500 origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
+                  <span className="absolute inset-0 w-full h-full bg-[#EDD187] origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
                   <span className="relative z-10 flex items-center justify-center">
                     Conheça Nossos Projetos <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </span>
@@ -568,9 +565,9 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group h-full">
-                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors">
-                    <box.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
+                <Card className="p-8 bg-card border-white/10 hover:border-[#EDD187]/50 transition-all duration-300 group h-full">
+                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#EDD187]/10 transition-colors">
+                    <box.icon className="h-8 w-8 text-zinc-500 group-hover:text-[#EDD187] transition-colors" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">{box.title}</h3>
                   <p className="text-muted-foreground">{box.description}</p>
@@ -599,16 +596,16 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }} 
                 whileInView={{ opacity: 1, y: 0 }} 
                 whileHover={{ y: -10 }}
-                className="aspect-square rounded-[40px] border border-white/5 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer hover:border-amber-500/30"
+                className="aspect-square rounded-[40px] border border-white/5 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer hover:border-[#EDD187]/30"
               >
                 <div className="flex justify-end">
-                  <Code2 className="text-zinc-700 w-10 h-10 group-hover:text-amber-500 transition-colors" />
+                  <Code2 className="text-zinc-700 w-10 h-10 group-hover:text-[#EDD187] transition-colors" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-3xl mb-1">Abela Mielo</h3>
                   <div className="flex items-center justify-between">
-                    <p className="text-zinc-500 font-medium text-sm group-hover:text-amber-500/70">Brand Design & Website</p>
-                    <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-amber-500 group-hover:text-black transition-all">
+                    <p className="text-zinc-500 font-medium text-sm group-hover:text-[#EDD187]/70">Brand Design & Website</p>
+                    <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-[#EDD187] group-hover:text-black transition-all">
                       <ArrowRight className="w-5 h-5 -rotate-45" />
                     </div>
                   </div>
@@ -620,16 +617,16 @@ export default function Home() {
                 initial={{ opacity: 0, y: 40 }} 
                 whileInView={{ opacity: 1, y: 20 }} 
                 whileHover={{ y: 10 }}
-                className="aspect-square rounded-[40px] border border-white/5 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer hover:border-amber-500/30"
+                className="aspect-square rounded-[40px] border border-white/5 grid-pattern relative flex flex-col justify-between p-10 bg-[#080808] group cursor-pointer hover:border-[#EDD187]/30"
               >
                 <div className="flex justify-end">
-                  <Sparkles className="text-zinc-700 w-10 h-10 group-hover:text-amber-500 transition-colors" />
+                  <Sparkles className="text-zinc-700 w-10 h-10 group-hover:text-[#EDD187] transition-colors" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
                   <div className="flex items-center justify-between">
-                    <p className="text-zinc-500 font-medium text-sm group-hover:text-amber-500/70">Software Financeiro</p>
-                    <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-amber-500 group-hover:text-black transition-all">
+                    <p className="text-zinc-500 font-medium text-sm group-hover:text-[#EDD187]/70">Software Financeiro</p>
+                    <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-[#EDD187] group-hover:text-black transition-all">
                       <ArrowRight className="w-5 h-5 -rotate-45" />
                     </div>
                   </div>
@@ -670,9 +667,9 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group h-full">
-                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors">
-                    <area.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
+                <Card className="p-8 bg-card border-white/10 hover:border-[#EDD187]/50 transition-all duration-300 group h-full">
+                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#EDD187]/10 transition-colors">
+                    <area.icon className="h-8 w-8 text-zinc-500 group-hover:text-[#EDD187] transition-colors" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">{area.title}</h3>
                   <p className="text-muted-foreground">{area.description}</p>
@@ -705,7 +702,6 @@ export default function Home() {
                   preload="auto"
                   className="w-full max-w-[450px] object-contain transition-all"
                   style={{
-                    // Faz o fundo preto do vídeo sumir e cria uma sombra de holograma azul clarinho
                     mixBlendMode: "screen", 
                     filter: "drop-shadow(0px 0px 15px rgba(100, 200, 255, 0.4))"
                   }}
@@ -716,7 +712,7 @@ export default function Home() {
             {/* Lado Direito - Lista Dinâmica de Títulos (Scroll Reveal) */}
             <div className="w-full lg:w-3/5 flex flex-col justify-center pl-0 lg:pl-16">
               
-              {/* Vídeo Visível Apenas no Mobile (Em mobile ele vai dar autoplay em loop porque a tela rola rápido) */}
+              {/* Vídeo Visível Apenas no Mobile */}
               <div className="lg:hidden mb-12 flex flex-col items-center">
                 <video 
                   src="/robo-video.mp4" 
@@ -730,21 +726,19 @@ export default function Home() {
                 <p className="text-sm text-zinc-500 mt-2 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
               </div>
 
-              {/* LISTA DE TÍTULOS - ESPAÇAMENTOS REDUZIDOS E SEM CORTAR */}
+              {/* LISTA DE TÍTULOS */}
               <div className="flex flex-col space-y-1 md:space-y-2 px-2 py-8">
                 {servicesList.map((service, index) => {
                   const total = servicesList.length;
                   
-                  // Calculando os pontos exatos de início, pico e fim de destaque para cada item
                   const center = index / (total - 1);
                   const start = (index - 1) / (total - 1);
                   const end = (index + 1) / (total - 1);
                   
-                  // Interpola a cor com base na porcentagem de descida da tela
                   const color = useTransform(
                     smoothServicosProgress,
                     [start, center, end],
-                    ["#27272a", "#ffffff", "#27272a"] // Cor inativa (zinc-800) -> Ativa (Branco) -> Inativa
+                    ["#27272a", "#ffffff", "#27272a"] 
                   );
 
                   return (
@@ -777,11 +771,11 @@ export default function Home() {
               { number: "04", title: "Sustentabilidade", description: "Integramos princípios ESG em todos os projetos." }
             ].map((item, index) => (
               <motion.div key={index} initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: index * 0.1 }} className="flex gap-4 group cursor-default">
-                <div className="flex-shrink-0 w-12 h-12 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center group-hover:border-amber-500/50 group-hover:bg-amber-500/10 transition-colors">
-                  <span className="text-zinc-500 font-bold text-xl group-hover:text-amber-500 transition-colors">{item.number}</span>
+                <div className="flex-shrink-0 w-12 h-12 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center group-hover:border-[#EDD187]/50 group-hover:bg-[#EDD187]/10 transition-colors">
+                  <span className="text-zinc-500 font-bold text-xl group-hover:text-[#EDD187] transition-colors">{item.number}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-amber-500 transition-colors">{item.title}</h3>
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-[#EDD187] transition-colors">{item.title}</h3>
                   <p className="text-muted-foreground">{item.description}</p>
                 </div>
               </motion.div>
@@ -805,7 +799,7 @@ export default function Home() {
               size="lg" 
               className="relative overflow-hidden bg-white text-black border-0 group font-bold"
             >
-              <span className="absolute inset-0 w-full h-full bg-amber-500 origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
+              <span className="absolute inset-0 w-full h-full bg-[#EDD187] origin-left -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0" />
               <span className="relative z-10 flex items-center justify-center">
                 Agendar Reunião <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </span>
@@ -822,12 +816,12 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="max-w-2xl mx-auto text-center space-y-8">
             <h2 className="text-4xl md:text-5xl font-bold">Entre em Contato</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
-              <a href="mailto:contato@overthuretech.com" className="flex items-center gap-2 text-white hover:text-amber-500 transition-colors">
+              <a href="mailto:contato@overthuretech.com" className="flex items-center gap-2 text-white hover:text-[#EDD187] transition-colors">
                 <Mail className="h-5 w-5 text-white" /> <span>contato@overthuretech.com</span>
               </a>
               <div className="flex items-center gap-4">
-                <Instagram className="h-6 w-6 text-white cursor-pointer hover:text-amber-500 transition-colors" />
-                <WhatsappIcon className="h-6 w-6 text-white cursor-pointer hover:text-amber-500 transition-colors" />
+                <Instagram className="h-6 w-6 text-white cursor-pointer hover:text-[#EDD187] transition-colors" />
+                <WhatsappIcon className="h-6 w-6 text-white cursor-pointer hover:text-[#EDD187] transition-colors" />
               </div>
             </div>
           </motion.div>
@@ -840,8 +834,8 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <span className="text-sm text-muted-foreground">© 2026 Overthure Tech. Todos os direitos reservados.</span>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-amber-500 transition-colors">Privacidade</a>
-              <a href="#" className="hover:text-amber-500 transition-colors">Termos de Uso</a>
+              <a href="#" className="hover:text-[#EDD187] transition-colors">Privacidade</a>
+              <a href="#" className="hover:text-[#EDD187] transition-colors">Termos de Uso</a>
             </div>
           </div>
         </div>
