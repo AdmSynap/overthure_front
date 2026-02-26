@@ -6,13 +6,66 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring } from "fram
 import { useLocation } from "wouter";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
+// --- INÍCIO DO COMPONENTE ROBÔ BINÁRIO ---
+const BinaryRobot = () => {
+  const [robotText, setRobotText] = useState("");
+  
+  const robotShape = [
+    "       0101010101010       ",
+    "     10101010101010101     ",
+    "    0101   01010   1010    ",
+    "    1010   10101   0101    ",
+    "     10101010101010101     ",
+    "       0101010101010       ",
+    "          1010101          ",
+    "  10101010101010101010101  ",
+    "010101010101010101010101010",
+    "10101 10101010101010101 10101",
+    "01010 01010101010101010 01010",
+    "10101 10101010101010101 10101",
+    " 010  0101010   0101010  010 ",
+    "      1010101   1010101      ",
+    "      01010       01010      ",
+    "      10101       10101      ",
+    "     0101010     0101010     "
+  ];
+
+  useEffect(() => {
+    // Muda os números do robô aleatoriamente a cada 100ms para criar efeito Matrix
+    const interval = setInterval(() => {
+      const newText = robotShape.map(line => {
+        return line.split('').map(char => {
+          if (char === ' ') return ' ';
+          return Math.random() > 0.5 ? '1' : '0';
+        }).join('');
+      }).join('\n');
+      setRobotText(newText);
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div
+      animate={{ y: [0, -15, 0] }} // Animação flutuante
+      transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+      className="font-mono text-white whitespace-pre font-bold text-[10px] sm:text-xs md:text-sm lg:text-base leading-[1.1]"
+      style={{ 
+        textShadow: "0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)",
+        letterSpacing: "0.1em"
+      }}
+    >
+      {robotText || robotShape.join('\n')}
+    </motion.div>
+  );
+};
+// --- FIM DO COMPONENTE ROBÔ BINÁRIO ---
+
 // --- INÍCIO DO COMPONENTE CUBO BINÁRIO ---
 const BinaryCube = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   
-  // Otimização de Performance: Usando valores de movimento em vez de estado React
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothX = useSpring(mouseX, { damping: 25, stiffness: 200 });
@@ -192,7 +245,6 @@ const BinaryCube = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    // Atualiza diretamente na placa de vídeo, sem re-renderizar o componente
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
   };
@@ -248,6 +300,17 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const servicesList = [
+  { icon: Layers, title: "Desenvolvimento Web & Mobile", description: "Criação de aplicações web e mobile modernas." },
+  { icon: Zap, title: "Criação de Sites", description: "Sites profissionais, modernos e otimizados para SEO." },
+  { icon: ShieldCheck, title: "Registro de domínio", description: "Registro e gerenciamento completo de domínios." },
+  { icon: Mail, title: "E-mail profissional", description: "Configuração de e-mails corporativos personalizados." },
+  { icon: Instagram, title: "Gestão de Redes Sociais", description: "Criação, administração e otimização de contas." },
+  { icon: Rocket, title: "Desenvolvimento de Software", description: "Softwares personalizados desenvolvidos do zero." },
+  { icon: Target, title: "Chatbots Completos", description: "Desenvolvimento de chatbots inteligentes." },
+  { icon: Lightbulb, title: "Design & Branding de Marca", description: "Desenvolvimento de identidades visuais inteligentes." }
+];
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const lenisRef = useRef<any>(null);
@@ -260,6 +323,19 @@ export default function Home() {
 
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  // --- LÓGICA DE ANIMAÇÃO DA SEÇÃO DE SERVIÇOS ---
+  const servicosRef = useRef(null);
+  const { scrollYProgress: servicosProgress } = useScroll({
+    target: servicosRef,
+    offset: ["start start", "end end"]
+  });
+
+  const smoothServicosProgress = useSpring(servicosProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -318,12 +394,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground relative">
       
-      {/* SEU COMPONENTE DE PARTÍCULAS IMPORTADO AQUI */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
         <ParticlesBackground />
       </div>
 
-      {/* OTIMIZAÇÃO: Estilos CSS puros para a barra de rolagem usando as classes do Lenis */}
       <style dangerouslySetInnerHTML={{ __html: `
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -436,7 +510,6 @@ export default function Home() {
       {/* HERO SECTION */}
       <section ref={heroRef} className="relative min-h-[110vh] flex items-center justify-center z-10 pt-20 overflow-hidden">
         
-        {/* CUBO EM POSIÇÃO ABSOLUTA NO CANTO DIREITO INFERIOR */}
         <div className="absolute bottom-0 right-[-180px] lg:bottom-10 lg:right-[-120px] w-[500px] h-[500px] lg:w-[850px] lg:h-[850px] z-0 opacity-40 lg:opacity-70">
             <BinaryCube />
         </div>
@@ -645,51 +718,62 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Nossos Serviços */}
-      <section id="servicos" className="py-24 bg-card/30 relative z-10">
-        <div className="container">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Nossos Serviços</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Suporte técnico especializado e consultoria estratégica.</p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { icon: Layers, title: "Desenvolvimento Web & Mobile", description: "Criação de aplicações web e mobile modernas." },
-              { icon: Zap, title: "Criação de Sites", description: "Sites profissionais, modernos e otimizados para SEO." },
-              { icon: ShieldCheck, title: "Registro de domínio", description: "Registro e gerenciamento completo de domínios." },
-              { icon: Mail, title: "E-mail profissional", description: "Configuração de e-mails corporativos personalizados." },
-              { icon: Instagram, title: "Gestão de Redes Sociais", description: "Criação, administração e otimização de contas." },
-              { icon: Rocket, title: "Desenvolvimento de Software", description: "Softwares personalizados desenvolvidos do zero." },
-              { icon: Target, title: "Chatbots Completos", description: "Desenvolvimento de chatbots inteligentes." },
-              { icon: Lightbulb, title: "Design & Branding de Marca", description: "Desenvolvimento de identidades visuais inteligentes." }
-            ].map((service, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-                className={`flex ${index === 6 || index === 7 ? 'lg:translate-x-[50%]' : ''}`}
+      {/* SEÇÃO NOSSOS SERVIÇOS (REFEITA COM O ROBÔ E LISTA DINÂMICA) */}
+      <section id="servicos" ref={servicosRef} className="h-[250vh] relative bg-black z-10">
+        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
+          <div className="container h-full flex items-center">
+            
+            {/* Lado Esquerdo - Fixo e Substituído pelo Robô Binário (Visível em Desktop) */}
+            <div className="hidden lg:flex w-2/5 h-full flex-col justify-center items-center pr-10">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: false }} 
+                transition={{ duration: 0.6 }}
+                className="flex items-center justify-center w-full"
               >
-                <Card className="p-8 bg-card border-white/10 hover:border-amber-500/50 transition-all duration-300 group w-full flex flex-col">
-                  <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center mb-6 group-hover:bg-amber-500/10 transition-colors shrink-0">
-                    <service.icon className="h-8 w-8 text-zinc-500 group-hover:text-amber-500 transition-colors" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
-                  <p className="text-muted-foreground flex-grow">{service.description}</p>
-                </Card>
+                <BinaryRobot />
               </motion.div>
-            ))}
-          </div>
+            </div>
+            
+            {/* Lado Direito - Lista Dinâmica de Títulos (Scroll Reveal) */}
+            <div className="w-full lg:w-3/5 flex flex-col justify-center pl-0 lg:pl-16">
+              
+              {/* O Robô substituindo o Título Visível Apenas no Mobile */}
+              <div className="lg:hidden mb-12 flex flex-col items-center">
+                <BinaryRobot />
+                <p className="text-sm text-zinc-500 mt-8 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
+              </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-16 text-center space-y-6">
-            <p className="text-muted-foreground text-lg md:text-xl font-medium">Não encontrou o que procura? Entre em contato.</p>
-            <Button onClick={() => setLocation("/contato-form")} size="lg" className="bg-white text-black hover:bg-white/90 border-0 transition-all group px-8 font-bold">
-              Solicitar Orçamento <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </motion.div>
+              {/* LISTA DE TÍTULOS - ESPAÇAMENTOS REDUZIDOS (space-y-1, md:space-y-2 e py-1) */}
+              <div className="flex flex-col space-y-1 md:space-y-2 px-2 py-8">
+                {servicesList.map((service, index) => {
+                  const total = servicesList.length;
+                  
+                  // Calculando os pontos exatos de início, pico e fim de destaque para cada item
+                  const center = index / (total - 1);
+                  const start = (index - 1) / (total - 1);
+                  const end = (index + 1) / (total - 1);
+                  
+                  // Interpola a cor com base na porcentagem de descida da tela
+                  const color = useTransform(
+                    smoothServicosProgress,
+                    [start, center, end],
+                    ["#27272a", "#ffffff", "#27272a"] // Cor inativa (zinc-800) -> Ativa (Branco) -> Inativa
+                  );
+
+                  return (
+                    <motion.div key={index} style={{ color }} className="transition-colors duration-100 ease-linear py-1">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-normal font-extrabold uppercase tracking-tight cursor-default">
+                        {service.title}
+                      </h3>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
