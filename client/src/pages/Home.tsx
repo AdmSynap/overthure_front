@@ -10,28 +10,52 @@ import ParticlesBackground from "@/components/ParticlesBackground";
 const BinaryRobot = () => {
   const [robotText, setRobotText] = useState("");
   
+  // Matriz redesenhada para formar o robô exato da imagem
   const robotShape = [
-    "       0101010101010       ",
-    "     10101010101010101     ",
-    "    0101   01010   1010    ",
-    "    1010   10101   0101    ",
-    "     10101010101010101     ",
-    "       0101010101010       ",
-    "          1010101          ",
-    "  10101010101010101010101  ",
-    "010101010101010101010101010",
-    "10101 10101010101010101 10101",
-    "01010 01010101010101010 01010",
-    "10101 10101010101010101 10101",
-    " 010  0101010   0101010  010 ",
-    "      1010101   1010101      ",
-    "      01010       01010      ",
-    "      10101       10101      ",
-    "     0101010     0101010     "
+    "                      0                      ",
+    "                     000                     ",
+    "                    00000                    ",
+    "                   0000000                   ",
+    "                    00000                    ",
+    "                     000                     ",
+    "                      0                      ",
+    "                      0                      ",
+    "             0000000000000000000             ",
+    "          0000000000000000000000000          ",
+    "        00000000000000000000000000000        ",
+    "      000000000000000000000000000000000      ",
+    "     00000000000000000000000000000000000     ",
+    "    00000   0000000000   0000000000   00000  ",
+    "   00000  0000000000000 0000000000000  00000 ",
+    "  00000  00000      0000000      00000  00000",
+    "  00000  0000  0000  00000  0000  0000  00000",
+    "  00000  0000  0000  00000  0000  0000  00000",
+    "  00000  0000        00000        0000  00000",
+    "  00000   00000    000000000    00000   00000",
+    "   00000    0000000000   0000000000    00000 ",
+    "   0000000                  0        0000000 ",
+    "    00000000000000000000000000000000000000   ",
+    "      000000000000000000000000000000000    0 ",
+    "        00000000000000000000000000000    000 ",
+    "           00000000000000000000000     00000 ",
+    "               000000000000000       000000  ",
+    "            000000000000000000000   000000   ",
+    "         0000000000000000000000000 000000    ",
+    "       0000  00000000000000000000000000      ",
+    "      00000  000000000000000000000000        ",
+    "     00000   000000000000000000000           ",
+    "     0000    000000000000000000000           ",
+    "      000     0000000000000000000            ",
+    "               00000000000000000             ",
+    "                 0000000000000               ",
+    "                  0000   0000                ",
+    "                 0000     0000               ",
+    "                0000       0000              ",
+    "               0000         0000             "
   ];
 
   useEffect(() => {
-    // Muda os números do robô aleatoriamente a cada 100ms para criar efeito Matrix
+    // Transforma os "0"s em números binários aleatórios (0 ou 1) em tempo real, mantendo espaços vazios
     const interval = setInterval(() => {
       const newText = robotShape.map(line => {
         return line.split('').map(char => {
@@ -46,12 +70,13 @@ const BinaryRobot = () => {
 
   return (
     <motion.div
-      animate={{ y: [0, -15, 0] }} // Animação flutuante
+      animate={{ y: [0, -10, 0] }} // Animação flutuante sutil
       transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-      className="font-mono text-white whitespace-pre font-bold text-[10px] sm:text-xs md:text-sm lg:text-base leading-[1.1]"
+      className="font-mono text-white whitespace-pre font-bold text-[6px] sm:text-[8px] md:text-[10px] lg:text-[12px] leading-[1.1]"
       style={{ 
-        textShadow: "0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)",
-        letterSpacing: "0.1em"
+        // Sombra alterada para dar um efeito holográfico com tom leve de azulciano, como na imagem
+        textShadow: "0 0 5px rgba(255, 255, 255, 0.8), 0 0 15px rgba(200, 230, 255, 0.6), 0 0 25px rgba(100, 200, 255, 0.4)",
+        letterSpacing: "0.15em"
       }}
     >
       {robotText || robotShape.join('\n')}
@@ -745,7 +770,7 @@ export default function Home() {
                 <p className="text-sm text-zinc-500 mt-8 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
               </div>
 
-              {/* LISTA DE TÍTULOS - ESPAÇAMENTOS REDUZIDOS (space-y-1, md:space-y-2 e py-1) */}
+              {/* LISTA DE TÍTULOS - ESPAÇAMENTOS REDUZIDOS E SEM CORTAR */}
               <div className="flex flex-col space-y-1 md:space-y-2 px-2 py-8">
                 {servicesList.map((service, index) => {
                   const total = servicesList.length;
