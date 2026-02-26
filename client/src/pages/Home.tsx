@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Code2, Sparkles } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLocation } from "wouter";
+import ParticlesBackground from "@/components/ParticlesBackground";
 
 // --- INÍCIO DO COMPONENTE CUBO BINÁRIO (ESTRUTURA VAZADA APENAS COM CÓDIGO) ---
 const BinaryCube = () => {
@@ -105,7 +106,6 @@ const BinaryCube = () => {
         const bFaces = [[0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [0, 1, 2, 3], [4, 5, 6, 7]];
 
         const color = isHighlight ? colorMediumGray : colorLightGray;
-        // Tornamos o preenchimento completamente transparente para focar apenas no binário
         const edgeColor = "rgba(209, 213, 219, 0.2)";
 
         bFaces.sort((a, b) => {
@@ -117,7 +117,6 @@ const BinaryCube = () => {
         bFaces.forEach((f) => {
             const p0 = projBarVerts[f[0]], p1 = projBarVerts[f[1]], p2 = projBarVerts[f[2]], p3 = projBarVerts[f[3]];
             
-            // Desenha apenas o contorno (opcional, ajuda na forma 3D)
             ctx.beginPath();
             ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
             ctx.closePath();
@@ -125,7 +124,6 @@ const BinaryCube = () => {
             ctx.lineWidth = 0.5;
             ctx.stroke();
 
-            // Renderização do código binário
             ctx.save();
             ctx.clip(); 
             const cxF = (p0.x + p1.x + p2.x + p3.x) / 4;
@@ -142,7 +140,6 @@ const BinaryCube = () => {
             const sAvg = (p0.scale + p2.scale) / 2;
             const fSize = Math.max(9, (barThickness - 4) * sAvg);
             
-            // Agora o texto binário usa a cor clara para brilhar no fundo escuro em todas as faces
             ctx.fillStyle = color;
             ctx.font = `${fSize}px monospace`;
             ctx.textAlign = "center";
@@ -324,8 +321,13 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen bg-background text-foreground ${isScrolling ? 'scrolling' : 'idle'}`}>
+    <div className={`min-h-screen bg-background text-foreground relative ${isScrolling ? 'scrolling' : 'idle'}`}>
       
+      {/* SEU COMPONENTE DE PARTÍCULAS IMPORTADO AQUI */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
+        <ParticlesBackground />
+      </div>
+
       <style dangerouslySetInnerHTML={{ __html: `
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -462,7 +464,8 @@ export default function Home() {
               initial="initial"
               animate="animate"
               variants={staggerContainer}
-              className="space-y-8 text-center max-w-4xl mx-auto"
+              // ALTERAÇÃO AQUI: text-center e mx-auto removidos, text-left adicionado, max-w ajustado
+              className="space-y-8 text-left max-w-3xl"
             >
               <motion.div variants={fadeInUp} className="inline-block px-4 py-2 bg-[#1a1a1a] border border-white/10 rounded-full mb-4">
                 <span className="text-white/80 text-sm font-medium">Inovação que Transforma o Futuro</span>
@@ -472,11 +475,12 @@ export default function Home() {
                 Desenvolvendo o <span className="text-zinc-500">Amanhã</span> com Tecnologia de Ponta
               </motion.h1>
               
-              <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+              <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground">
                 Com foco e dedicação à pesquisa e desenvolvimento de soluções inovadoras que revolucionam indústrias e criam valor sustentável.
               </motion.p>
               
-              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              {/* ALTERAÇÃO AQUI: justify-center mudado para justify-start */}
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 pt-4">
                 <Button 
                   onClick={() => scrollToSection('portfolio')} 
                   size="lg" 
