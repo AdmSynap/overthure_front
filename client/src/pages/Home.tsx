@@ -5,6 +5,7 @@ import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldC
 import { motion, useScroll, useTransform, useMotionValue, useSpring, useMotionValueEvent } from "framer-motion";
 import { useLocation } from "wouter";
 import ParticlesBackground from "@/components/ParticlesBackground";
+import roboVideo from "./robo.mp4";
 
 // --- INÍCIO DO COMPONENTE CUBO BINÁRIO (Hero) ---
 const BinaryCube = () => {
@@ -680,8 +681,8 @@ export default function Home() {
         </div>
       </section>
       
-      {/* SEÇÃO NOSSOS SERVIÇOS (REFEITA COM O VÍDEO DO ROBÔ SCRUBBING) */}
-      <section id="servicos" ref={servicosRef} className="h-[250vh] relative bg-black z-10">
+{/* SEÇÃO NOSSOS SERVIÇOS */}
+<section id="servicos" ref={servicosRef} className="h-[250vh] relative bg-black z-10">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
           <div className="container h-full flex items-center">
             
@@ -696,14 +697,17 @@ export default function Home() {
               >
                 <video 
                   ref={videoRef}
-                  src="/robo-video.mp4" 
+                  src={roboVideo} 
                   muted 
                   playsInline
                   preload="auto"
-                  className="w-full max-w-[450px] object-contain transition-all"
+                  className="w-full max-w-[450px] object-contain" 
                   style={{
-                    mixBlendMode: "screen", 
-                    filter: "drop-shadow(0px 0px 15px rgba(100, 200, 255, 0.4))"
+                    mixBlendMode: "screen",
+                    filter: "contrast(1.2)",
+                    // TCHAU VEO: Cortando 15% da lateral direita.
+                    // inset(topo direita baixo esquerda)
+                    clipPath: "inset(0px 15% 0px 0px)" 
                   }}
                 />
               </motion.div>
@@ -715,13 +719,18 @@ export default function Home() {
               {/* Vídeo Visível Apenas no Mobile */}
               <div className="lg:hidden mb-12 flex flex-col items-center">
                 <video 
-                  src="/robo-video.mp4" 
+                  src={roboVideo} 
                   autoPlay
                   loop
                   muted
                   playsInline
                   className="w-48 object-contain mb-4"
-                  style={{ mixBlendMode: "screen", filter: "drop-shadow(0px 0px 10px rgba(100, 200, 255, 0.4))" }}
+                  style={{ 
+                    mixBlendMode: "screen", 
+                    filter: "contrast(1.2)",
+                    // Mesma tesoura no mobile
+                    clipPath: "inset(0px 15% 0px 0px)"
+                  }}
                 />
                 <p className="text-sm text-zinc-500 mt-2 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
               </div>
