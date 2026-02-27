@@ -2,10 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Lightbulb, Rocket, Target, Mail, Instagram, Layers, ShieldCheck, Zap, Star, Shield, Headphones, Cpu, Code2, Sparkles } from "lucide-react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { useLocation } from "wouter";
 import ParticlesBackground from "@/components/ParticlesBackground";
-import roboVideo from "./robo.mp4";
 
 // --- INÍCIO DO COMPONENTE CUBO BINÁRIO (Hero) ---
 const BinaryCube = () => {
@@ -273,24 +272,17 @@ export default function Home() {
 
   // --- LÓGICA DE ANIMAÇÃO DA SEÇÃO DE SERVIÇOS ---
   const servicosRef = useRef(null);
-  const videoRef = useRef<HTMLVideoElement>(null); 
 
   const { scrollYProgress: servicosProgress } = useScroll({
     target: servicosRef,
     offset: ["start start", "end end"]
   });
 
-  const smoothServicosProgress = useSpring(servicosProgress, {
-    stiffness: 100,
-    damping: 30,
+  // Mola ajustada para as frases acenderem firmes, mas suavizadas
+  const smoothTextProgress = useSpring(servicosProgress, {
+    stiffness: 150,
+    damping: 25,
     restDelta: 0.001
-  });
-
-  // --- SINCRONIZANDO O VÍDEO COM O SCROLL ---
-  useMotionValueEvent(smoothServicosProgress, "change", (latest) => {
-    if (videoRef.current && videoRef.current.duration) {
-      videoRef.current.currentTime = latest * videoRef.current.duration;
-    }
   });
 
   useEffect(() => {
@@ -681,77 +673,43 @@ export default function Home() {
         </div>
       </section>
       
-{/* SEÇÃO NOSSOS SERVIÇOS */}
-{/* SEÇÃO NOSSOS SERVIÇOS */}
-<section id="servicos" ref={servicosRef} className="h-[250vh] relative bg-black z-10">
+      {/* SEÇÃO NOSSOS SERVIÇOS ATUALIZADA */}
+      <section id="servicos" ref={servicosRef} style={{ height: "600vh" }} className="relative bg-black z-10">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
           <div className="container h-full flex items-center">
             
-            {/* Lado Esquerdo - O VÍDEO DO ROBÔ (Visível em Desktop) */}
+            {/* Lado Esquerdo - Espaço Vazio (Reservado) */}
             <div className="hidden lg:flex w-2/5 h-full flex-col justify-center items-center pr-10">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }} 
-                whileInView={{ opacity: 1, scale: 1 }} 
-                viewport={{ once: false }} 
-                transition={{ duration: 0.6 }}
-                className="flex items-center justify-center w-full relative"
-              >
-                <video 
-                  ref={videoRef}
-                  src={roboVideo} 
-                  muted 
-                  playsInline
-                  preload="auto"
-                  // Aumentamos o max-w e adicionamos scale-[1.4] para ele ficar 40% maior!
-                  className="w-full max-w-[600px] object-contain scale-[1.4] xl:scale-[1.5]" 
-                  style={{
-                    mixBlendMode: "screen",
-                    filter: "contrast(1.2)",
-                    clipPath: "inset(0px 15% 0px 0px)" 
-                  }}
-                />
-              </motion.div>
             </div>
             
             {/* Lado Direito - Lista Dinâmica de Títulos (Scroll Reveal) */}
             <div className="w-full lg:w-3/5 flex flex-col justify-center pl-0 lg:pl-16">
               
-              {/* Vídeo Visível Apenas no Mobile */}
               <div className="lg:hidden mb-12 flex flex-col items-center">
-                <video 
-                  src={roboVideo} 
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  // Mudamos de w-48 (pequeno) para w-80 (bem maior no celular) e scale-110
-                  className="w-72 sm:w-80 object-contain mb-4 scale-110"
-                  style={{ 
-                    mixBlendMode: "screen", 
-                    filter: "contrast(1.2)",
-                    clipPath: "inset(0px 15% 0px 0px)"
-                  }}
-                />
-                <p className="text-sm text-zinc-500 mt-2 uppercase tracking-widest font-bold">Role para explorar os serviços</p>
+                <p className="text-sm text-zinc-500 mt-2 uppercase tracking-widest font-bold">
+                  Role para explorar os serviços
+                </p>
               </div>
 
-              {/* LISTA DE TÍTULOS */}
-              <div className="flex flex-col space-y-1 md:space-y-2 px-2 py-8">
+              {/* LISTA DE TÍTULOS COM O EFEITO DE PLATÔ */}
+              <div className="flex flex-col space-y-1 md:space-y-4 px-2 py-8">
                 {servicesList.map((service, index) => {
                   const total = servicesList.length;
                   
-                  const center = index / (total - 1);
-                  const start = (index - 1) / (total - 1);
-                  const end = (index + 1) / (total - 1);
+                  const step = 1 / (total - 1); 
+                  const center = index * step;
+                  const start = center - step;
+                  const end = center + step;
                   
+                  // A cor se mantém no branco num "platô" de 1/4 do tamanho do step, dando respiro pro usuário
                   const color = useTransform(
-                    smoothServicosProgress,
-                    [start, center, end],
-                    ["#27272a", "#ffffff", "#27272a"] 
+                    smoothTextProgress,
+                    [start, center - (step / 4), center + (step / 4), end],
+                    ["#27272a", "#ffffff", "#ffffff", "#27272a"] 
                   );
 
                   return (
-                    <motion.div key={index} style={{ color }} className="transition-colors duration-100 ease-linear py-1">
+                    <motion.div key={index} style={{ color }} className="transition-colors duration-75 ease-linear py-1 md:py-2">
                       <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-normal font-extrabold uppercase tracking-tight cursor-default">
                         {service.title}
                       </h3>
@@ -802,7 +760,6 @@ export default function Home() {
           <h2 className="text-4xl md:text-5xl font-bold text-white">Pronto para Fazer Parte da Revolução?</h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             
-            {/* BOTÃO BRANCO 3: AGENDAR REUNIÃO */}
             <Button 
               onClick={() => setLocation("/contato-form")} 
               size="lg" 

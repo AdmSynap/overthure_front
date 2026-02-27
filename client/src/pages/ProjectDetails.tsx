@@ -1,13 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
-// 1. IMPORTANTE: Adicionado useSpring
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowDown, ExternalLink, Calendar, Layers, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
+// IMPORTANDO A IMAGEM DIRETAMENTE DA MESMA PASTA
+import principalImg from "./principal.png";
+
 interface Project {
   title: string;
+  titleImage?: string; 
   subtitle: string;
   category: string;
   description: string;
@@ -22,17 +25,18 @@ interface Project {
 const projectsData: Record<string, Project> = {
   "abela-mielo": {
     title: "Abela Mielo",
+    titleImage: principalImg, // Imagem importada
     subtitle: "Redefinindo a Estética Natural",
     category: "Brand Design & Website",
     description: "Uma abordagem minimalista e sensorial para uma marca de cosméticos naturais. O desafio foi traduzir a pureza dos ingredientes em uma experiência digital imersiva, utilizando texturas orgânicas e uma paleta de cores terrosa com toques de sofisticação.",
-    year: "2025",
-    client: "Abela Mielo Cosmetics",
-    services: ["Identidade Visual", "UX/UI Design", "Frontend Dev"],
-    color: "from-white to-gray-500", // Cor neutra para o gradiente de texto
-    url: "https://www.instagram.com/abelamielo",
+    year: "2026",
+    client: "Melífera Abela Mielo",
+    services: ["Design & Branding", "UX/UI Design", "Desenvolvimento Web", "Registro de Domínio", "E-mail Profissional", "Gestão Redes Sociais"],
+    color: "from-white to-zinc-500", 
+    url: "https://abelamielo.com.br/",
     images: [
-      "bg-gradient-to-br from-gray-900/60 to-black",
-      "bg-gradient-to-tl from-gray-800/50 to-black",
+      "bg-gradient-to-br from-zinc-900/60 to-black", 
+      "bg-gradient-to-tl from-zinc-800/50 to-black", 
       "bg-gradient-to-bl from-zinc-900/40 to-black"
     ]
   },
@@ -44,12 +48,12 @@ const projectsData: Record<string, Project> = {
     year: "2024",
     client: "FinTech Global Corp",
     services: ["Software Architecture", "React Development", "Real-time Data"],
-    color: "from-gray-300 to-gray-600", // Cor neutra para o gradiente de texto
+    color: "from-zinc-300 to-zinc-600",
     url: "https://www.google.com",
     images: [
       "bg-gradient-to-br from-zinc-900/60 to-black",
       "bg-gradient-to-tl from-zinc-800/50 to-black",
-      "bg-gradient-to-bl from-gray-900/40 to-black"
+      "bg-gradient-to-bl from-zinc-900/40 to-black" 
     ]
   }
 };
@@ -58,21 +62,18 @@ const projectsData: Record<string, Project> = {
 const ZoomImage = ({ imgClass, index }: { imgClass: string, index: number }) => {
     const ref = useRef(null);
     
-    // 1. Captura o scroll bruto
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ["start end", "center center"] 
     });
 
-    // 2. Aplica a física de mola (O segredo do "Buttery Smooth")
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 150, // Tensão da mola (quanto maior, mais rápido segue)
-        damping: 25,    // Fricção (quanto maior, menos "balança")
-        mass: 0.5,      // Peso
+        stiffness: 150, 
+        damping: 25,    
+        mass: 0.5,      
         restDelta: 0.001
     });
 
-    // 3. Usa o valor suavizado (smoothProgress) ao invés do bruto
     const scale = useTransform(smoothProgress, [0, 1], [0.85, 1]);
     const opacity = useTransform(smoothProgress, [0, 0.6], [0.5, 1]);
 
@@ -180,20 +181,30 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
       {/* CONTEÚDO */}
       <div className="container mx-auto px-4 pt-24 pb-20 relative z-10">
         
-        {/* TÍTULO */}
+        {/* TÍTULO / IMAGEM APROXIMADO */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-5xl mx-auto mb-24 text-center"
+          className="max-w-5xl mx-auto mb-24 text-center flex flex-col items-center justify-center"
         >
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tighter leading-[0.9]">
-            {project.title}
-            <span className={`block text-2xl md:text-4xl font-normal mt-4 bg-gradient-to-r ${project.color} bg-clip-text text-transparent tracking-normal font-sans`}>
-              {project.subtitle}
-            </span>
-          </h1>
+          {project.titleImage ? (
+            <img 
+              src={project.titleImage} 
+              alt={project.title} 
+              // AQUI ESTÁ A MÁGICA: margens negativas (-mb-8 e -mb-16) para cortar o espaço transparente da imagem
+              className="h-32 md:h-48 w-auto object-cover -mb-8 md:-mb-16 drop-shadow-2xl relative z-10 pointer-events-none" 
+            />
+          ) : (
+            <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tighter leading-[0.9]">
+              {project.title}
+            </h1>
+          )}
+          
+          <h2 className={`text-2xl md:text-4xl font-normal bg-gradient-to-r ${project.color} bg-clip-text text-transparent tracking-normal font-sans relative z-20`}>
+            {project.subtitle}
+          </h2>
         </motion.div>
 
         {/* INFO GRID */}
@@ -242,7 +253,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* GALERIA SECUNDÁRIA (COM EFEITO SPRING) */}
+        {/* GALERIA SECUNDÁRIA */}
         <div className="space-y-8">
           <div className="grid md:grid-cols-2 gap-8">
             {project.images.slice(1).map((imgClass, index) => (
