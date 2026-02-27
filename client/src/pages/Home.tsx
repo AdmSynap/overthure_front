@@ -682,6 +682,7 @@ export default function Home() {
       </section>
       
 {/* SEÇÃO NOSSOS SERVIÇOS */}
+{/* SEÇÃO NOSSOS SERVIÇOS */}
 <section id="servicos" ref={servicosRef} className="h-[250vh] relative bg-black z-10">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
           <div className="container h-full flex items-center">
@@ -701,12 +702,11 @@ export default function Home() {
                   muted 
                   playsInline
                   preload="auto"
-                  className="w-full max-w-[450px] object-contain" 
+                  // Aumentamos o max-w e adicionamos scale-[1.4] para ele ficar 40% maior!
+                  className="w-full max-w-[600px] object-contain scale-[1.4] xl:scale-[1.5]" 
                   style={{
                     mixBlendMode: "screen",
                     filter: "contrast(1.2)",
-                    // TCHAU VEO: Cortando 15% da lateral direita.
-                    // inset(topo direita baixo esquerda)
                     clipPath: "inset(0px 15% 0px 0px)" 
                   }}
                 />
@@ -724,11 +724,11 @@ export default function Home() {
                   loop
                   muted
                   playsInline
-                  className="w-48 object-contain mb-4"
+                  // Mudamos de w-48 (pequeno) para w-80 (bem maior no celular) e scale-110
+                  className="w-72 sm:w-80 object-contain mb-4 scale-110"
                   style={{ 
                     mixBlendMode: "screen", 
                     filter: "contrast(1.2)",
-                    // Mesma tesoura no mobile
                     clipPath: "inset(0px 15% 0px 0px)"
                   }}
                 />
