@@ -62,7 +62,6 @@ export default function Investor() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // DADOS PARA O EMAILJS
     const form = formRef.current;
     
     const templateParams = {
@@ -73,12 +72,9 @@ export default function Investor() {
         message: form?.interest.value
     };
 
-    // --- SUAS CHAVES DO EMAILJS ---
-    // Dica: Você pode usar o mesmo Service ID e Public Key, 
-    // mas recomendo criar um Template diferente para Investidores.
-    const SERVICE_ID = "service_9jrlhhh";         // Mesmo do contato
-    const TEMPLATE_ID = "template_09d9pdy"; // Crie um template novo para investidores
-    const PUBLIC_KEY = "UQ-1Pjv_78A_IEebC";         // Mesma do contato
+    const SERVICE_ID = "service_9jrlhhh";         
+    const TEMPLATE_ID = "template_09d9pdy"; 
+    const PUBLIC_KEY = "UQ-1Pjv_78A_IEebC";         
 
     try {
         await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
@@ -88,7 +84,6 @@ export default function Investor() {
             description: "Nossa equipe de RI (Relações com Investidores) entrará em contato em até 24h.",
         });
         
-        // Redireciona para home após sucesso
         setTimeout(() => setLocation("/"), 4000);
 
     } catch (error) {
@@ -107,18 +102,18 @@ export default function Investor() {
   return (
     <div className={`min-h-screen bg-background text-foreground overflow-x-hidden ${isScrolling ? 'scrolling' : 'idle'}`}>
       
-      {/* --- ESTILO DINÂMICO DA SCROLLBAR --- */}
+      {/* --- ESTILO DINÂMICO DA SCROLLBAR EM BRANCO --- */}
       <style dangerouslySetInnerHTML={{ __html: `
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
-          background: ${isScrolling ? '#2dd4bf' : 'transparent'}; 
+          background: ${isScrolling ? '#ffffff' : 'transparent'}; 
           border-radius: 10px; 
           transition: background 0.3s; 
         }
         html {
           scrollbar-width: thin;
-          scrollbar-color: ${isScrolling ? '#2dd4bf' : 'transparent'} transparent;
+          scrollbar-color: ${isScrolling ? '#ffffff' : 'transparent'} transparent;
           transition: scrollbar-color 0.3s;
         }
       `}} />
@@ -132,7 +127,7 @@ export default function Investor() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-muted-foreground hover:text-teal-500 transition-colors mb-12"
+          className="flex items-center gap-2 text-muted-foreground hover:text-white transition-colors mb-12"
         >
           <ArrowLeft className="w-4 h-4" /> Voltar para Home
         </motion.button>
@@ -141,9 +136,11 @@ export default function Investor() {
           
           <div className="space-y-12">
             <motion.div variants={fadeInUp} initial="initial" animate="animate">
-              <span className="text-teal-500 font-medium tracking-wider text-sm uppercase">Investidores</span>
+              {/* Trocado text-teal-500 por text-zinc-400 */}
+              <span className="text-zinc-400 font-medium tracking-wider text-sm uppercase">Investidores</span>
               <h1 className="text-4xl md:text-5xl font-bold mt-2 mb-6 leading-tight">
-                Impulsione o Futuro com a <span className="text-teal-500">Overthure</span>
+                {/* Trocado text-teal-500 por text-zinc-500 */}
+                Impulsione o Futuro com a <span className="text-zinc-500">Overthure</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Estamos construindo a próxima geração de infraestrutura digital. Junte-se a nós nesta jornada e faça parte de um portfólio de alta performance.
@@ -158,9 +155,11 @@ export default function Investor() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 + 0.3 }}
                 >
-                  <Card className="bg-card/50 border-teal-500/20 hover:border-teal-500/50 transition-colors">
+                  {/* Bordas neutras */}
+                  <Card className="bg-card/50 border-white/10 hover:border-white/30 transition-colors">
                     <CardContent className="p-6 flex items-start gap-4">
-                      <div className="bg-teal-500/10 p-3 rounded-lg text-teal-500">
+                      {/* Ícones com fundo neutro e cor branca */}
+                      <div className="bg-white/5 border border-white/10 p-3 rounded-lg text-white">
                         <item.icon className="w-6 h-6" />
                       </div>
                       <div>
@@ -173,14 +172,15 @@ export default function Investor() {
               ))}
             </div>
             
+            {/* Box inferior neutro */}
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               transition={{ delay: 0.8 }}
-              className="p-6 bg-gradient-to-r from-teal-900/20 to-orange-900/20 rounded-xl border border-white/10"
+              className="p-6 bg-white/5 rounded-xl border border-white/10"
             >
               <div className="flex items-center gap-3 mb-2">
-                <CheckCircle className="text-teal-500 w-5 h-5" />
+                <CheckCircle className="text-white w-5 h-5" />
                 <h4 className="font-bold text-white">Rodada Série A Aberta</h4>
               </div>
               <p className="text-sm text-gray-400 pl-8">
@@ -195,8 +195,10 @@ export default function Investor() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="sticky top-8"
           >
-            <Card className="bg-[#0a0a0a] border-orange-600/20 shadow-2xl shadow-orange-900/5 overflow-hidden">
-              <div className="h-2 w-full bg-gradient-to-r from-teal-500 to-orange-600" />
+            {/* Card do form com sombras e bordas neutras */}
+            <Card className="bg-[#0a0a0a] border-white/10 shadow-2xl overflow-hidden">
+              {/* Linha colorida do topo virou cinza sólido */}
+              <div className="h-2 w-full bg-zinc-700" />
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-white">Agendar Reunião</h2>
@@ -205,48 +207,44 @@ export default function Investor() {
                   </p>
                 </div>
 
-                {/* Form com REF para capturar dados */}
                 <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Nome</Label>
-                      {/* Name adicionado */}
-                      <Input id="firstName" name="firstName" placeholder="Seu nome" required className="bg-white/5 border-white/10 focus:border-orange-500" />
+                      {/* focus neutro */}
+                      <Input id="firstName" name="firstName" placeholder="Seu nome" required className="bg-white/5 border-white/10 focus:border-white/50 focus:ring-0" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastName">Sobrenome</Label>
-                      {/* Name adicionado */}
-                      <Input id="lastName" name="lastName" placeholder="Sobrenome" required className="bg-white/5 border-white/10 focus:border-orange-500" />
+                      <Input id="lastName" name="lastName" placeholder="Sobrenome" required className="bg-white/5 border-white/10 focus:border-white/50 focus:ring-0" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="email">E-mail Corporativo</Label>
-                    {/* Name adicionado */}
-                    <Input id="email" name="email" type="email" placeholder="voce@empresa.com" required className="bg-white/5 border-white/10 focus:border-orange-500" />
+                    <Input id="email" name="email" type="email" placeholder="voce@empresa.com" required className="bg-white/5 border-white/10 focus:border-white/50 focus:ring-0" />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="company">Empresa / Fundo</Label>
-                    {/* Name adicionado */}
-                    <Input id="company" name="company" placeholder="Nome da organização" className="bg-white/5 border-white/10 focus:border-orange-500" />
+                    <Input id="company" name="company" placeholder="Nome da organização" className="bg-white/5 border-white/10 focus:border-white/50 focus:ring-0" />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="interest">Mensagem / Interesse</Label>
-                    {/* Name adicionado */}
                     <Textarea 
                       id="interest"
                       name="interest"
                       placeholder="Breve descrição do seu interesse de investimento..." 
-                      className="min-h-[120px] bg-white/5 border-white/10 focus:border-orange-500 resize-none" 
+                      className="min-h-[120px] bg-white/5 border-white/10 focus:border-white/50 focus:ring-0 resize-none" 
                     />
                   </div>
 
+                  {/* Botão de Enviar branco sólido */}
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full h-12 mt-4 font-bold transition-all border-0 bg-gradient-to-r from-teal-500 to-orange-600 text-black hover:opacity-90"
+                    className="w-full h-12 mt-4 font-bold transition-all border-0 bg-white text-black hover:bg-gray-200"
                   >
                     {isSubmitting ? (
                       "Enviando..."

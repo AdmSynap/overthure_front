@@ -17,7 +17,7 @@ interface Project {
   year: string;
   client: string;
   services: string[];
-  color: string;
+  subtitleClass: string; 
   images: string[];
   url: string;
 }
@@ -25,14 +25,14 @@ interface Project {
 const projectsData: Record<string, Project> = {
   "abela-mielo": {
     title: "Abela Mielo",
-    titleImage: principalImg, // Imagem importada
-    subtitle: "Redefinindo a Estética Natural",
+    titleImage: principalImg, 
+    subtitle: "A assinatura da natureza em cada detalhe",
     category: "Brand Design & Website",
-    description: "Uma abordagem minimalista e sensorial para uma marca de cosméticos naturais. O desafio foi traduzir a pureza dos ingredientes em uma experiência digital imersiva, utilizando texturas orgânicas e uma paleta de cores terrosa com toques de sofisticação.",
+    description: "Transformar a tradição de um apicultor em uma marca premium com alcance digital. Nosso desafio foi construir a identidade visual e o site do absoluto zero, traduzindo a riqueza e a textura dos favos de mel em uma experiência minimalista. Utilizamos paletas que remetem ao néctar e ao âmbar para criar uma vitrine virtual imersiva, posicionando o produto como uma verdadeira iguaria da alta gastronomia.",
     year: "2026",
     client: "Melífera Abela Mielo",
     services: ["Design & Branding", "UX/UI Design", "Desenvolvimento Web", "Registro de Domínio", "E-mail Profissional", "Gestão Redes Sociais"],
-    color: "from-white to-zinc-500", 
+    subtitleClass: "text-zinc-200 font-serif font-light tracking-wide", 
     url: "https://abelamielo.com.br/",
     images: [
       "bg-gradient-to-br from-zinc-900/60 to-black", 
@@ -41,14 +41,14 @@ const projectsData: Record<string, Project> = {
     ]
   },
   "core-engine": {
-    title: "Core Engine",
+    title: "Synapsis Core",
     subtitle: "High-Frequency Trading Platform",
     category: "Software Financeiro",
     description: "Desenvolvimento de uma interface de alta performance para traders institucionais. O foco foi a redução da carga cognitiva e a velocidade de resposta. Criamos um sistema de design modular que permite a visualização de dados complexos em tempo real com clareza absoluta.",
-    year: "2024",
-    client: "FinTech Global Corp",
-    services: ["Software Architecture", "React Development", "Real-time Data"],
-    color: "from-zinc-300 to-zinc-600",
+    year: "2025",
+    client: "Overthure Applications",
+    services: ["Desenvolvimento de Software", "Desenvolvimento Web & Mobile", "Registro de Domínio", "E-mail Corporativo", "Design & Branding"],
+    subtitleClass: "bg-gradient-to-r from-zinc-300 to-zinc-600 bg-clip-text text-transparent font-sans tracking-normal",
     url: "https://www.google.com",
     images: [
       "bg-gradient-to-br from-zinc-900/60 to-black",
@@ -181,20 +181,20 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
       {/* CONTEÚDO */}
       <div className="container mx-auto px-4 pt-24 pb-20 relative z-10">
         
-        {/* TÍTULO / IMAGEM APROXIMADO */}
+        {/* TÍTULO / IMAGEM COM TAMANHOS FORÇADOS E NATIVOS DO TAILWIND */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-5xl mx-auto mb-24 text-center flex flex-col items-center justify-center"
+          className="w-full max-w-6xl mx-auto mb-24 flex flex-col items-center justify-center text-center"
         >
           {project.titleImage ? (
             <img 
               src={project.titleImage} 
               alt={project.title} 
-              // AQUI ESTÁ A MÁGICA: margens negativas (-mb-8 e -mb-16) para cortar o espaço transparente da imagem
-              className="h-32 md:h-48 w-auto object-cover -mb-8 md:-mb-16 drop-shadow-2xl relative z-10 pointer-events-none" 
+              // AQUI: Forçando a largura fixa com w-32 (128px) e md:w-56 (224px). Sem gambiarras de max-w.
+              className="w-32 md:w-56 h-auto object-contain -mb-2 md:-mb-4 drop-shadow-2xl relative z-10 pointer-events-none" 
             />
           ) : (
             <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tighter leading-[0.9]">
@@ -202,7 +202,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
             </h1>
           )}
           
-          <h2 className={`text-2xl md:text-4xl font-normal bg-gradient-to-r ${project.color} bg-clip-text text-transparent tracking-normal font-sans relative z-20`}>
+          <h2 className={`text-2xl md:text-4xl relative z-20 ${project.subtitleClass}`}>
             {project.subtitle}
           </h2>
         </motion.div>
@@ -270,7 +270,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                 className="text-2xl font-bold text-white hover:text-gray-400 transition-colors p-0 h-auto"
                 onClick={() => setLocation(projectId === 'abela-mielo' ? '/project/core-engine' : '/project/abela-mielo')}
             >
-                {projectId === 'abela-mielo' ? 'Core Engine' : 'Abela Mielo'} <ArrowRight className="ml-4 w-6 h-6" />
+                {projectId === 'abela-mielo' ? 'Synapsis Core' : 'Abela Mielo'} <ArrowRight className="ml-4 w-6 h-6" />
             </Button>
         </div>
 
