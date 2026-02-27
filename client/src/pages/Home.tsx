@@ -616,7 +616,7 @@ export default function Home() {
                   <Sparkles className="text-zinc-700 w-10 h-10 group-hover:text-[#EDD187] transition-colors" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-3xl mb-1">Core Engine</h3>
+                  <h3 className="text-white font-bold text-3xl mb-1">Synapsis Core</h3>
                   <div className="flex items-center justify-between">
                     <p className="text-zinc-500 font-medium text-sm group-hover:text-[#EDD187]/70">Software Financeiro</p>
                     <div className="bg-white/5 p-2.5 rounded-full border border-white/10 group-hover:bg-[#EDD187] group-hover:text-black transition-all">
